@@ -4,11 +4,24 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 
+import { BrowserRouter } from 'react-router-dom';
+import { CriiptoVerifyProvider } from '@criipto/verify-react';
+import { AuthProvider } from './context/AuthContext';
+
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
+  <CriiptoVerifyProvider
+    domain='velia.criipto.id'
+    clientID='urn:my:application:identifier:835104'
+    redirectUri={window.location.href}
+    store={window.sessionStorage}
+  >
+    <AuthProvider>
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </AuthProvider>
+  </CriiptoVerifyProvider>
 );
 
 // If you want to start measuring performance in your app, pass a function
