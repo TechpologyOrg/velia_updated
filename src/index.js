@@ -13,7 +13,7 @@ root.render(
   <CriiptoVerifyProvider
     domain='velia.criipto.id'
     clientID='urn:my:application:identifier:835104'
-    redirectUri={window.location.href}
+    redirectUri={window.location.origin + '/callback'}
     store={window.sessionStorage}
   >
     <AuthProvider>
