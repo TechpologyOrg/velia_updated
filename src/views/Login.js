@@ -14,26 +14,11 @@ export default function Login() {
     const [submitting, setSubmitting] = useState(false);
 
     const startBankIdLogin = async (thisDevice = false) => {
+        sessionStorage.setItem('returnTo', '/dashboard');
+
         await loginWithRedirect({
             acr_values: thisDevice ? "urn:grn:authn:se:bankid:same-device" : "urn:grn:authn:se:bankid:another-device:qr"
         })
-    }
-
-    const finishLogin = async () => {
-        if(!result?.id_token) return;
-        try{
-            setSubmitting(true);
-
-            console.log(`result: ${result}`);
-            console.log(`claims: ${claims}`);
-            console.log(`error: ${error}`);
-        }
-        catch(e){
-            console.error("Error during login:", e);
-        }
-        finally{
-            setSubmitting(false);
-        }
     }
 
     return (
