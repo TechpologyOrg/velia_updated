@@ -1,14 +1,137 @@
-import React, { createContext, useState, useContext } from 'react';
+import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
+
+const REFRESH_ENDPOINT = 'https://api.velia.se/api/v1/auth/refresh';
+const LOGOUT_ENDPOINT  = 'https://api.velia.se/api/v1/auth/logout';
+const STORAGE_KEY = 'velia_refresh_token';
 
 const AuthContext = createContext(null);
 
-export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
+function parseJwt(token) {
+  try {
+    const payload = token.split('.')[1];
+    return JSON.parse(atob(payload));
+  } catch { return null; }
+}
+function msUntilExpiry(token) {
+  const p = parseJwt(token);
+  if (!p?.exp) return -1;
+  const now = Math.floor(Date.now()/1000);
+  return (p.exp - now) * 1000;
+}
 
-  const logout = () => setUser(null);
+export function AuthProvider({ children }) {
+  const [accessToken, setAccessToken] = useState(null);
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  const refreshInFlight = useRef(null);
+  const refreshTimerId = useRef(null);
+
+  // Rehydrate on load using refresh token
+  useEffect(() => {
+    (async () => {
+      const rt = sessionStorage.getItem(STORAGE_KEY);
+      if (!rt) { setLoading(false); return; }
+      try {
+        const at = await refreshAccessToken(rt);
+        if (at) hydrateFromAccessToken(at);
+      } catch {
+        sessionStorage.removeItem(STORAGE_KEY);
+      } finally {
+        setLoading(false);
+      }
+    })();
+    return () => clearTimeout(refreshTimerId.current);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  function hydrateFromAccessToken(token, fallbackUser) {
+    setAccessToken(token);
+    const claims = parseJwt(token) || {};
+    // Prefer server user if provided, else map minimal claims
+    setUser(fallbackUser ?? {
+      sub: claims.sub,
+      name: claims.name,
+      ssn:  claims.ssn,
+      email: claims.email
+    });
+    scheduleRefresh(token);
+  }
+
+  function scheduleRefresh(token) {
+    clearTimeout(refreshTimerId.current);
+    const ms = msUntilExpiry(token);
+    const when = Math.max(ms - 30_000, 1_000); // 30s before expiry
+    refreshTimerId.current = setTimeout(() => {
+      const rt = sessionStorage.getItem(STORAGE_KEY);
+      if (!rt) return logout();
+      refreshAccessToken(rt).catch(() => logout());
+    }, when);
+  }
+
+  async function refreshAccessToken(refreshToken) {
+    if (refreshInFlight.current) return refreshInFlight.current;
+
+    refreshInFlight.current = (async () => {
+      const res = await fetch(REFRESH_ENDPOINT, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Refresh-Token': refreshToken
+        }
+      });
+      refreshInFlight.current = null;
+
+      if (!res.ok) throw new Error('Refresh failed');
+      const json = await res.json();
+      const at = json?.access;  // Django key name
+      const rt = json?.refresh; // Django key name
+      if (!at) throw new Error('No access token');
+
+      if (rt) sessionStorage.setItem(STORAGE_KEY, rt);
+      setAccessToken(at);
+      scheduleRefresh(at);
+      return at;
+    })();
+
+    return refreshInFlight.current;
+  }
+
+  async function login({ access, refresh, user: serverUser }) {
+    // Call this after your AuthenticationController hits Django and gets tokens
+    if (!access || !refresh) throw new Error('Missing tokens');
+    sessionStorage.setItem(STORAGE_KEY, refresh);
+    hydrateFromAccessToken(access, serverUser);
+  }
+
+  async function logout() {
+    try { await fetch(LOGOUT_ENDPOINT, { method: 'POST' }); } catch {}
+    sessionStorage.removeItem(STORAGE_KEY);
+    setAccessToken(null);
+    setUser(null);
+    clearTimeout(refreshTimerId.current);
+  }
+
+  async function getValidAccessToken() {
+    if (!accessToken) return null;
+    if (msUntilExpiry(accessToken) <= 10_000) {
+      const rt = sessionStorage.getItem(STORAGE_KEY);
+      if (!rt) { await logout(); return null; }
+      try { return await refreshAccessToken(rt); }
+      catch { await logout(); return null; }
+    }
+    return accessToken;
+  }
 
   return (
-    <AuthContext.Provider value={{ user, setUser, logout }}>
+    <AuthContext.Provider value={{
+      user,
+      isAuthenticated: !!accessToken,
+      loading,
+      login,
+      logout,
+      getValidAccessToken,
+    }}>
       {children}
     </AuthContext.Provider>
   );

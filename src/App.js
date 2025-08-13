@@ -8,11 +8,17 @@ import Callback from './views/criipto/Callback';
 
 import Dashboard from './views/velia/Dashboard';
 import AuthenticationController from './controllers/AuthenticationController';
-import axios from 'axios';
+import { useAuth } from './context/AuthContext';
+import { bindAuthHelpers } from './utils/authHelpers';
 
 export default function App() {
-  axios.defaults.baseURL = "https://api.velia.se/api/v1";
-  axios.defaults.withCredentials = false;
+  const auth = useAuth();
+
+  bindAuthHelpers({
+    getValidAccessToken: auth.getValidAccessToken,
+    onUnauthorized: auth.logout
+  });
+
   return (
     <Routes>
       <Route path='/' element={<Home />} />
