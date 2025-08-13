@@ -9,7 +9,7 @@ import Callback from './views/criipto/Callback';
 import Dashboard from './views/velia/Dashboard';
 import AuthenticationController from './controllers/AuthenticationController';
 import { useAuth } from './context/AuthContext';
-import { bindAuthHelpers } from './utils/authHelpers';
+import { bindAuthHelpers } from './lib/axiosClient';
 
 export default function App() {
   const auth = useAuth();
