@@ -14,7 +14,7 @@ export default function AuthenticationController() {
             try
             {
                 const idToken = state?.idToken || sessionStorage.getItem('id_token');
-                axios.post('/api/v1/auth/bankid/login/', { id_token: idToken })
+                axios.post('/auth/bankid/login/', { id_token: idToken })
                 .then(response => {
                     console.log("Authentication response:", response);
                     setUser({
