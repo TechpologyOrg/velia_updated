@@ -8,8 +8,10 @@ import Callback from './views/criipto/Callback';
 
 import Dashboard from './views/velia/Dashboard';
 import AuthenticationController from './controllers/AuthenticationController';
+import axios from 'axios';
 
 export default function App() {
+  axios.defaults.baseURL = "https://api.velia.app/api/v1";
   return (
     <Routes>
       <Route path='/' element={<Home />} />
