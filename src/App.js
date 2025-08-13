@@ -12,6 +12,7 @@ import axios from 'axios';
 
 export default function App() {
   axios.defaults.baseURL = "https://api.velia.app/api/v1";
+  axios.defaults.withCredentials = false;
   return (
     <Routes>
       <Route path='/' element={<Home />} />
