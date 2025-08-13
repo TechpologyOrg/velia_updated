@@ -22,11 +22,11 @@ export default function AuthenticationController() {
                         ssn: response.data.ssn,
                         idToken
                     });
-                    sessionStorage.setItem('user', JSON.stringify(user));
+                    sessionStorage.setItem('user', JSON.stringify(response.data));
                     sessionStorage.removeItem('id_token');
                     sessionStorage.removeItem('claims');
                     
-                    console.log("User authenticated successfully:", user);
+                    console.log("User authenticated successfully:", response.data);
                     navigate('/dashboard', { replace: true });
                 })
                 .catch(error => {
