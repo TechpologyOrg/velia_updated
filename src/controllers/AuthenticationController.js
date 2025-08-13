@@ -16,12 +16,17 @@ export default function AuthenticationController() {
                 const idToken = state?.idToken || sessionStorage.getItem('id_token');
                 axios.post('/api/v1/auth/bankid/login/', { id_token: idToken })
                 .then(response => {
-                    const user = response.data;
-                    setUser(user);
+                    console.log("Authentication response:", response);
+                    setUser({
+                        name: response.data.name,
+                        ssn: response.data.ssn,
+                        idToken
+                    });
                     sessionStorage.setItem('user', JSON.stringify(user));
                     sessionStorage.removeItem('id_token');
                     sessionStorage.removeItem('claims');
                     
+                    console.log("User authenticated successfully:", user);
                     navigate('/dashboard', { replace: true });
                 })
                 .catch(error => {
@@ -37,6 +42,7 @@ export default function AuthenticationController() {
                 navigate('/Login', { replace: true });
             }
         }
+        run();
     }, []);
 
     return (
