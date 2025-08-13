@@ -2,6 +2,7 @@ import React, {useEffect, useState} from 'react'
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
+import api from '../lib/axiosClient';
 
 const REFRESH_STORAGE_KEY = 'velia_refresh_token';
 
@@ -16,7 +17,7 @@ export default function AuthenticationController() {
             try
             {
                 const idToken = state?.idToken || sessionStorage.getItem('id_token');
-                await axios.post('/auth/bankid/login/', { id_token: idToken }, {headers: { 'Content-Type': 'application/json' }})
+                await api.post('/auth/bankid/login/', { id_token: idToken }, {headers: { 'Content-Type': 'application/json' }})
                 .then(async (response) => {
                     console.log("Authentication response:", response);
 
