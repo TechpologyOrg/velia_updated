@@ -15,12 +15,19 @@ export default function Callback() {
             if(!result?.id_token || posting) return;
             setPosting(true);
             try{
-                console.log(result.id_token);
-                console.log(claims);
-
                 const returnTo = sessionStorage.getItem('returnTo') || '/';
                 sessionStorage.removeItem('returnTo');
-                navigate(returnTo, { replace: true });
+
+                sessionStorage.setItem('id_token', result.id_token);
+                sessionStorage.setItem('claims', JSON.stringify(claims || {}));
+
+                navigate(returnTo, { 
+                    replace: true,
+                    state: { 
+                        id_token: result.id_token,
+                        claims
+                    }
+                });
             }
             catch(e)
             {
