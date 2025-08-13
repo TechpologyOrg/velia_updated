@@ -14,7 +14,7 @@ export default function Login() {
     const [submitting, setSubmitting] = useState(false);
 
     const startBankIdLogin = async (thisDevice = false) => {
-        sessionStorage.setItem('returnTo', '/dashboard');
+        sessionStorage.setItem('returnTo', '/controllers/authenticate');
 
         await loginWithRedirect({
             acr_values: thisDevice ? "urn:grn:authn:se:bankid:same-device" : "urn:grn:authn:se:bankid:another-device:qr"
