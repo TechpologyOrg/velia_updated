@@ -11,7 +11,7 @@ import AuthenticationController from './controllers/AuthenticationController';
 import axios from 'axios';
 
 export default function App() {
-  axios.defaults.baseURL = "https://api.velia.app/api/v1";
+  axios.defaults.baseURL = "https://api.velia.se/api/v1";
   axios.defaults.withCredentials = false;
   return (
     <Routes>
