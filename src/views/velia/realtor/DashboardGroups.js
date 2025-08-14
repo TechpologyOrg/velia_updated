@@ -1,18 +1,23 @@
 import React, {useState, useEffect} from 'react'
 import api from "../../../lib/axiosClient"
+import { useAuth } from '../../../context/AuthContext'
 
 export default function DashboardGroups() {
   const [groups, setGroups] = useState([])
+  const { loading, isAuthenticated } = useAuth()
 
   useEffect(()=>{
+    if (loading) return;
+    if (!isAuthenticated) return;
     api.get("/groups/mine/")
     .then(resp => {
       console.log(resp.data);
+      setGroups(resp.data ?? [])
     })
     .catch(err=>{
-      console.error(err.message)
+      console.error(err?.response?.data || err.message)
     })
-  }, [])
+  }, [loading, isAuthenticated])
 
   return (
     <div className="flex flex-col w-full h-full">
