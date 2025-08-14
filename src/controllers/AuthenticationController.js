@@ -44,7 +44,7 @@ export default function AuthenticationController() {
                     }
                     
                     console.log("User authenticated successfully:", response.data);
-                    navigate('/dashboard', { replace: true });
+                    navigate('/dashboard/groups', { replace: true });
                 })
                 .catch(error => {
                     console.error("Authentication error:", error);
