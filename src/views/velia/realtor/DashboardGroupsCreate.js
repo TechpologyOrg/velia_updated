@@ -239,8 +239,8 @@ export default function DashboardGroupsCreate() {
 
     return (
         <div className="flex flex-col w-full h-full">
-            <p className="text-2xl md:text-3xl font-semibold mb-2">Skapa Grupp</p>
-            <p className="text-neutral-500">Skapa ett nytt grupp för fastigheten</p>
+            <p className="text-2xl md:text-3xl font-semibold mb-2">{(id ? "Redigera" : "Skapa")} Grupp</p>
+            <p className="text-neutral-500">{(id ? "Redigera" : "Skapa")} en ny grupp för fastigheten</p>
 
             <div className="flex flex-col w-full gap-4 mt-8">
                 {/* Add group info */}
@@ -263,7 +263,7 @@ export default function DashboardGroupsCreate() {
                 />
 
                 {/* Add customer */}
-                <p>Lägg till säljare</p>
+                <p>{(id ? "Redigera" : "Lägg till")} säljare</p>
                 <AddCustomerWindow
                     customers={customers}
                     setCustomers={setCustomers}
