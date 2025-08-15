@@ -156,7 +156,16 @@ export default function DashboardGroupsCreate() {
                 setPostnummer(resp.data.postnummer)
                 setOrt(resp.data.ort)
                 setSelectedCoordinator(resp.data.coordinator)
-                setCustomers(resp.data.customers)
+                
+                var _customers = [];
+                for (var customer of resp.data.customers) {
+                    _customers.push({
+                        fullName: customer.first_name + " " + customer.last_name,
+                        email: customer.email,
+                        personnummer: customer.personnummer
+                    })
+                }
+                setCustomers(_customers)
             })
             .catch(err=>{
                 console.error(err.message)
