@@ -221,7 +221,7 @@ export default function DashboardGroupsCreate() {
             postnummer: postnummer,
             ort: ort,
             coordinator: selectedCoordinator.id,
-            realtors: sessionStorage.getItem("user")["id"],
+            realtor: sessionStorage.getItem("user")["id"],
             customers: _customerIds
         })
         .then(resp=>{
