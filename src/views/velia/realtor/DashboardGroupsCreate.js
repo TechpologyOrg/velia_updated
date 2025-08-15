@@ -187,7 +187,6 @@ export default function DashboardGroupsCreate() {
             console.warn("No customers to create. Did AddCustomerWindow pass up customers correctly?");
         }
 
-        var _customerIds = [];
         Promise.all(
             customers.map(customer => {
                 const [first_name, ...rest] = customer.fullName.split(" ");
@@ -213,22 +212,20 @@ export default function DashboardGroupsCreate() {
                 .map(c => c.id);
 
             console.log("Created customer IDs:", customerIds);
-            _customerIds = customerIds;
-        });
-
-        api.post("/groups/", {
-            address: address,
-            postnummer: postnummer,
-            ort: ort,
-            coordinator: selectedCoordinator.id,
-            realtor: JSON.parse(sessionStorage.getItem("user")).user.id,
-            customers: _customerIds
-        })
-        .then(resp=>{
-            console.log(resp.data)
-        })
-        .catch(err=>{
-            console.error(err.message)
+            
+            // Now create the group with the customer IDs
+            return api.post("/groups/", {
+                address: address,
+                postnummer: postnummer,
+                ort: ort,
+                coordinator: selectedCoordinator.id,
+                realtor: JSON.parse(sessionStorage.getItem("user")).user.id,
+                customers: customerIds
+            });
+        }).then(resp => {
+            console.log("Group created successfully:", resp.data);
+        }).catch(err => {
+            console.error("Error creating group:", err.message);
         });
     }
 
