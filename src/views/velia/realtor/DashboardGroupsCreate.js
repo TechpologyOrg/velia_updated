@@ -182,7 +182,7 @@ export default function DashboardGroupsCreate() {
         console.log(sessionStorage.getItem("user")["id"])
 
         // Create customers
-        const _customers = customers.map(customer=>{
+        customers.map(customer=>{
             var first_name = customer.fullName.split(" ")[0]
             var last_name = customer.fullName.split(" ").slice(1).join(" ")
 
