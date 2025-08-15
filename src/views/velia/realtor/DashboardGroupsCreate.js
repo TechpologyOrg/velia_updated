@@ -181,33 +181,30 @@ export default function DashboardGroupsCreate() {
     const createGroup = () => {
         console.log(sessionStorage.getItem("user")["id"])
 
-        // Create customers
-        // This code will send a POST request for each customer, but there are a few issues:
-        // 1. The requests are sent in parallel and not awaited, so you can't collect the created customer IDs for the group.
-        // 2. If you want to use the created customers in the next API call (e.g., to add them to the group), you need to wait for all requests to finish and collect their IDs.
-
-        // Here's a correct approach using Promise.all to wait for all customer creations and collect their IDs:
         Promise.all(
             customers.map(customer => {
                 const [first_name, ...rest] = customer.fullName.split(" ");
                 const last_name = rest.join(" ");
-                return api.post("/users/customers/", {
+                const payload = {
                     email: customer.email,
                     first_name: first_name,
                     last_name: last_name,
                     personnummer: customer.personnummer,
-                }).then(resp => resp.data)
-                  .catch(err => {
-                      console.error(err.message);
-                      return null; // or handle error as needed
-                  });
+                };
+                console.log("Sending POST /users/customers/ with payload:", payload);
+                return api.post("/users/customers/", payload)
+                    .then(resp => resp.data)
+                    .catch(err => {
+                        console.error("Error creating customer:", err.message);
+                        return null;
+                    });
             })
         ).then(createdCustomers => {
             // Filter out failed creations
             const customerIds = createdCustomers
                 .filter(c => c && c.id)
                 .map(c => c.id);
-            
+
             console.log("Created customer IDs:", customerIds);
         });
 
