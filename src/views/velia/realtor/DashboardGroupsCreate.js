@@ -256,7 +256,7 @@ export default function DashboardGroupsCreate() {
             </div>
 
             <div className='flex flex-row gap-2 w-full justify-center mt-[40px]'>
-                <button className="px-4 py-2 bg-black cursor-pointer text-white rounded-md w-[180px]" onClick={()=>{createGroup()}}>Skapa grupp</button>
+                <button className="px-4 py-2 bg-black cursor-pointer text-white rounded-md w-[180px]" onClick={()=>{createGroup(); navigate("/dashboard/groups")}}>Skapa grupp</button>
             </div>
 
         </div>
