@@ -3,6 +3,7 @@ import api from "../../../lib/axiosClient"
 import { useAuth } from '../../../context/AuthContext'
 import { useNavigate } from 'react-router-dom'
 import V_SelectObject from '../../../components/V_SelectObject'
+import { useParams } from 'react-router-dom'
 
 import { FaPlus, FaEdit, FaCheck, FaTrash } from 'react-icons/fa';
 
@@ -148,6 +149,20 @@ export default function DashboardGroupsCreate() {
     const [ort, setOrt] = useState("");
 
     useEffect(()=>{
+        if (id) {
+            api.get(`/groups/${id}/`)
+            .then(resp=>{
+                setAddress(resp.data.address)
+                setPostnummer(resp.data.postnummer)
+                setOrt(resp.data.ort)
+                setSelectedCoordinator(resp.data.coordinator)
+                setCustomers(resp.data.customers)
+            })
+            .catch(err=>{
+                console.error(err.message)
+            })
+        }
+
         api.get("/users/staff/?role=coordinator")
         .then(resp=>{
             setCoordinators(resp.data.results)
