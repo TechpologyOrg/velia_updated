@@ -182,22 +182,34 @@ export default function DashboardGroupsCreate() {
         console.log(sessionStorage.getItem("user")["id"])
 
         // Create customers
-        customers.map(customer=>{
-            var first_name = customer.fullName.split(" ")[0]
-            var last_name = customer.fullName.split(" ").slice(1).join(" ")
+        // This code will send a POST request for each customer, but there are a few issues:
+        // 1. The requests are sent in parallel and not awaited, so you can't collect the created customer IDs for the group.
+        // 2. If you want to use the created customers in the next API call (e.g., to add them to the group), you need to wait for all requests to finish and collect their IDs.
 
-            api.post("/users/customers/",
-            {
-                email: customer.email,
-                first_name: first_name,
-                last_name: last_name,
-                personnummer: customer.personnummer,
-            }).then(resp=>{
-                console.log(resp.data)
-            }).catch(err=>{
-                console.error(err.message)
+        // Here's a correct approach using Promise.all to wait for all customer creations and collect their IDs:
+        Promise.all(
+            customers.map(customer => {
+                const [first_name, ...rest] = customer.fullName.split(" ");
+                const last_name = rest.join(" ");
+                return api.post("/users/customers/", {
+                    email: customer.email,
+                    first_name: first_name,
+                    last_name: last_name,
+                    personnummer: customer.personnummer,
+                }).then(resp => resp.data)
+                  .catch(err => {
+                      console.error(err.message);
+                      return null; // or handle error as needed
+                  });
             })
-        })
+        ).then(createdCustomers => {
+            // Filter out failed creations
+            const customerIds = createdCustomers
+                .filter(c => c && c.id)
+                .map(c => c.id);
+            
+            console.log("Created customer IDs:", customerIds);
+        });
 
         return;
 
@@ -241,7 +253,7 @@ export default function DashboardGroupsCreate() {
             </div>
 
             <div className='flex flex-row gap-2 w-full justify-center mt-[40px]'>
-                <button className="px-4 py-2 bg-black cursor-pointer text-white rounded-md w-[180px]" onClick={createGroup}>Skapa grupp</button>
+                <button className="px-4 py-2 bg-black cursor-pointer text-white rounded-md w-[180px]" onClick={()=>{createGroup()}}>Skapa grupp</button>
             </div>
 
         </div>

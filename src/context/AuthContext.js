@@ -89,9 +89,11 @@ export function AuthProvider({ children }) {
       const res = await fetch(REFRESH_ENDPOINT, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'X-Refresh-Token': refreshToken
-        }
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          refresh: refreshToken
+        })
       });
       refreshInFlight.current = null;
 
