@@ -19,6 +19,9 @@ api.interceptors.request.use(async (config) => {
     if (token) {
       config.headers = config.headers || {};
       config.headers.Authorization = `Bearer ${token}`;
+      console.log('Authorization header set for:', config.url);
+    } else {
+      console.log('No valid token available for:', config.url);
     }
   }
   return config;

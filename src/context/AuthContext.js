@@ -113,7 +113,26 @@ export function AuthProvider({ children }) {
   }
 
   async function getValidAccessToken() {
-    if (!accessToken) return null;
+    // If no access token but we have a refresh token, try to refresh
+    if (!accessToken) {
+      const rt = sessionStorage.getItem(STORAGE_KEY);
+      if (rt) {
+        try {
+          console.log('No access token, attempting refresh...');
+          const newToken = await refreshAccessToken(rt);
+          console.log('Refresh successful, new token:', newToken ? 'valid' : 'null');
+          return newToken;
+        } catch (error) {
+          console.error('Refresh failed:', error);
+          await logout();
+          return null;
+        }
+      }
+      console.log('No access token and no refresh token available');
+      return null;
+    }
+    
+    // If access token is expiring soon, refresh it
     if (msUntilExpiry(accessToken) <= 10_000) {
       const rt = sessionStorage.getItem(STORAGE_KEY);
       if (!rt) { await logout(); return null; }
