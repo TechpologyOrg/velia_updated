@@ -30,14 +30,25 @@ export function AuthProvider({ children }) {
   // Rehydrate on load using refresh token
   useEffect(() => {
     (async () => {
+      console.log('AuthContext: Starting rehydration...');
       const rt = sessionStorage.getItem(STORAGE_KEY);
-      if (!rt) { setLoading(false); return; }
+      if (!rt) { 
+        console.log('AuthContext: No refresh token found, setting loading to false');
+        setLoading(false); 
+        return; 
+      }
       try {
+        console.log('AuthContext: Refresh token found, attempting refresh...');
         const at = await refreshAccessToken(rt);
-        if (at) hydrateFromAccessToken(at);
-      } catch {
+        if (at) {
+          console.log('AuthContext: Refresh successful, hydrating...');
+          hydrateFromAccessToken(at);
+        }
+      } catch (error) {
+        console.error('AuthContext: Refresh failed during rehydration:', error);
         sessionStorage.removeItem(STORAGE_KEY);
       } finally {
+        console.log('AuthContext: Rehydration complete, setting loading to false');
         setLoading(false);
       }
     })();
@@ -46,6 +57,7 @@ export function AuthProvider({ children }) {
   }, []);
 
   function hydrateFromAccessToken(token, fallbackUser) {
+    console.log('AuthContext: Hydrating with token:', token ? 'valid' : 'null');
     setAccessToken(token);
     const claims = parseJwt(token) || {};
     // Prefer server user if provided, else map minimal claims
@@ -56,6 +68,7 @@ export function AuthProvider({ children }) {
       email: claims.email
     });
     scheduleRefresh(token);
+    console.log('AuthContext: Hydration complete, accessToken set');
   }
 
   function scheduleRefresh(token) {

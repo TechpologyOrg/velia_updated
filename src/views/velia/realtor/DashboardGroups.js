@@ -13,18 +13,26 @@ export default function DashboardGroups() {
   const navigate = useNavigate();
 
   useEffect(()=>{
-    if (loading) return;
-    if (!isAuthenticated) return;
+    console.log('DashboardGroups: useEffect triggered, loading:', loading, 'isAuthenticated:', isAuthenticated);
+    if (loading) {
+      console.log('DashboardGroups: Still loading, skipping API call');
+      return;
+    }
+    if (!isAuthenticated) {
+      console.log('DashboardGroups: Not authenticated, skipping API call');
+      return;
+    }
+    console.log('DashboardGroups: Making API call to /groups/mine/');
     api.get("/groups/mine/")
     .then(resp => {
-      console.log(resp.data);
+      console.log('DashboardGroups: API call successful:', resp.data);
       setGroups(resp.data.results ?? [])
       setGroupsCount(resp.data.count)
       setGroupsNext(resp.data.next)
       setGroupsPrev(resp.data.previous)
     })
     .catch(err=>{
-      console.error(err?.response?.data || err.message)
+      console.error('DashboardGroups: API call failed:', err?.response?.data || err.message)
     })
   }, [loading, isAuthenticated])
 
