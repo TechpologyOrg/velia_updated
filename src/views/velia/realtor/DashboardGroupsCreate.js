@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import api from "../../../lib/axiosClient"
 import { useAuth } from '../../../context/AuthContext'
 import { useNavigate } from 'react-router-dom'
+import V_SelectObject from '../../../components/V_SelectObject'
 
 import { FaPlus, FaEdit, FaCheck, FaTrash } from 'react-icons/fa';
 
@@ -138,31 +139,27 @@ export default function DashboardGroupsCreate() {
     const navigate = useNavigate();
 
     const [coordinators, setCoordinators] = useState([]);
-    const [realtors, setRealtors] = useState([]);
+    const [selectedCoordinator, setSelectedCoordinator] = useState(null);
 
     useEffect(()=>{
         api.get("/users/staff/?role=coordinator")
         .then(resp=>{
-            console.log(`coordinators: ${resp.data}`)
-        })
-        .catch(err=>{
-            console.error(err.message)
-        })
-
-        api.get("/users/staff/?role=realtor")
-        .then(resp=>{
-            console.log(`realtors: ${resp.data}`)
+            setCoordinators(resp.data.results)
         })
         .catch(err=>{
             console.error(err.message)
         })
     },[])
 
+    const handleCoordinatorSelect = (coordinator) => {
+        console.log(coordinator)
+        setSelectedCoordinator(coordinator)
+    }
+
     return (
         <div className="flex flex-col w-full h-full">
             <p className="text-2xl md:text-3xl font-semibold mb-2">Skapa Grupp</p>
             <p className="text-neutral-500">Skapa ett nytt grupp för fastigheten</p>
-
 
             <div className="flex flex-col w-full gap-4 mt-8">
                 {/* Add group info */}
@@ -174,6 +171,7 @@ export default function DashboardGroupsCreate() {
                 </div>
 
                 {/* Add realtor and coordinator */}
+                <V_SelectObject cardTitle='Välj koordinator' items={coordinators} displayKey='first_name' displayKey2='last_name' valueKey='id' onSelect={handleCoordinatorSelect} />
 
                 {/* Add customer */}
                 <p>Lägg till säljare</p>
