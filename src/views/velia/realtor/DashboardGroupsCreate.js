@@ -138,8 +138,27 @@ function AddCustomerWindow() {
 export default function DashboardGroupsCreate() {
     const navigate = useNavigate();
 
-    const [coordinators, setCoordinators] = useState([]);
+    // const [coordinators, setCoordinators] = useState([]);
+    const [coordinators, setCoordinators] = useState([
+		{
+			"id": 4,
+			"email": "daniel@asd.se",
+			"first_name": "Daniel",
+			"last_name": "Stjernkvist",
+			"role": "coordinator",
+			"personnummer": "200302157870"
+		},
+		{
+			"id": 5,
+			"email": "ludwig@asd.se",
+			"first_name": "Ludwig",
+			"last_name": "Kreisler",
+			"role": "coordinator",
+			"personnummer": "200406097691"
+		}
+	]);
     const [selectedCoordinator, setSelectedCoordinator] = useState(null);
+    const [customers, setCustomers] = useState([]);
 
     useEffect(()=>{
         api.get("/users/staff/?role=coordinator")
@@ -152,8 +171,43 @@ export default function DashboardGroupsCreate() {
     },[])
 
     const handleCoordinatorSelect = (coordinator) => {
-        console.log(coordinator)
         setSelectedCoordinator(coordinator)
+    }
+
+    const createGroup = () => {
+        console.log(sessionStorage.getItem("user")["id"])
+
+        // Create customers
+        const _customers = customers.map(customer=>{
+            var first_name = customer.fullName.split(" ")[0]
+            var last_name = customer.fullName.split(" ").slice(1).join(" ")
+
+            axios.post("/users/customers/",
+            {
+                email: customer.email,
+                first_name: first_name,
+                last_name: last_name,
+                personnummer: customer.personnummer,
+            }).then(resp=>{
+                console.log(resp.data)
+            }).catch(err=>{
+                console.error(err.message)
+            })
+        })
+
+        return;
+
+        api.post("/groups/", {
+            address: address,
+            postnummer: postnummer,
+            ort: ort,
+            coordinator: selectedCoordinator.id,
+            realtors: sessionStorage.getItem("user")["id"],
+            customers: []
+        })
+        .then(resp=>{
+            console.log(resp.data)
+        })
     }
 
     return (
@@ -175,7 +229,15 @@ export default function DashboardGroupsCreate() {
 
                 {/* Add customer */}
                 <p>Lägg till säljare</p>
-                <AddCustomerWindow />
+                <AddCustomerWindow
+                    customers={[]}
+                    setCustomers={()=>{}}
+                />
+
+            </div>
+
+            <div className='flex flex-row gap-2 w-full justify-center mt-[40px]'>
+                <button className="px-4 py-2 bg-black cursor-pointer text-white rounded-md w-[180px]" onClick={createGroup}>Skapa grupp</button>
             </div>
 
         </div>
