@@ -32,6 +32,7 @@ export default function App() {
       <Route path='/dashboard' element={<Dashboard />} >
         <Route path='groups' element={<DashboardGroups />} />
         <Route path='groups/create' element={<DashboardGroupsCreate />} />
+        <Route path='groups/create/:id' element={<DashboardGroupsCreate />} />
       </Route>
     </Routes>
   )

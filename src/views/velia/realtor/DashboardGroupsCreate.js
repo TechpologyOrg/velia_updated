@@ -136,26 +136,10 @@ function AddCustomerWindow({ customers, setCustomers }) {
 
 export default function DashboardGroupsCreate() {
     const navigate = useNavigate();
+    const { id } = useParams();
 
     // const [coordinators, setCoordinators] = useState([]);
-    const [coordinators, setCoordinators] = useState([
-		{
-			"id": 4,
-			"email": "daniel@asd.se",
-			"first_name": "Daniel",
-			"last_name": "Stjernkvist",
-			"role": "coordinator",
-			"personnummer": "200302157870"
-		},
-		{
-			"id": 5,
-			"email": "ludwig@asd.se",
-			"first_name": "Ludwig",
-			"last_name": "Kreisler",
-			"role": "coordinator",
-			"personnummer": "200406097691"
-		}
-	]);
+    const [coordinators, setCoordinators] = useState([]);
     const [selectedCoordinator, setSelectedCoordinator] = useState(null);
     const [customers, setCustomers] = useState([]);
 
