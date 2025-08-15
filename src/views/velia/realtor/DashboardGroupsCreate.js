@@ -160,6 +160,10 @@ export default function DashboardGroupsCreate() {
     const [selectedCoordinator, setSelectedCoordinator] = useState(null);
     const [customers, setCustomers] = useState([]);
 
+    const [address, setAddress] = useState("");
+    const [postnummer, setPostnummer] = useState("");
+    const [ort, setOrt] = useState("");
+
     useEffect(()=>{
         api.get("/users/staff/?role=coordinator")
         .then(resp=>{
@@ -182,7 +186,7 @@ export default function DashboardGroupsCreate() {
             var first_name = customer.fullName.split(" ")[0]
             var last_name = customer.fullName.split(" ").slice(1).join(" ")
 
-            axios.post("/users/customers/",
+            api.post("/users/customers/",
             {
                 email: customer.email,
                 first_name: first_name,
@@ -217,11 +221,11 @@ export default function DashboardGroupsCreate() {
 
             <div className="flex flex-col w-full gap-4 mt-8">
                 {/* Add group info */}
-                <input placeholder='Adress' className='text-[42px] px-4 border-b-[1px] border-neutral-300 font-medium max-w-[620px]' />
+                <input placeholder='Adress' value={address} onChange={e=>setAddress(e.target.value)} className='text-[42px] px-4 border-b-[1px] border-neutral-300 font-medium max-w-[620px]' />
                 <div className='flex flex-row gap-2 w-full text-[18px]'>
-                    <input placeholder='Postnummer' className='px-4 border-b-[1px] border-neutral-300 max-w-[220px]' />
+                    <input placeholder='Postnummer' value={postnummer} onChange={e=>setPostnummer(e.target.value)} className='px-4 border-b-[1px] border-neutral-300 max-w-[220px]' />
                     <p>,</p>
-                    <input placeholder='Ort' className='px-4 border-b-[1px] border-neutral-300 max-w-[220px]' />
+                    <input placeholder='Ort' value={ort} onChange={e=>setOrt(e.target.value)} className='px-4 border-b-[1px] border-neutral-300 max-w-[220px]' />
                 </div>
 
                 {/* Add realtor and coordinator */}
