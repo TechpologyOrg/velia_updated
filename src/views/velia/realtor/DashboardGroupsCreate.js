@@ -252,7 +252,15 @@ export default function DashboardGroupsCreate() {
                 </div>
 
                 {/* Add realtor and coordinator */}
-                <V_SelectObject cardTitle='Välj koordinator' items={coordinators} displayKey='first_name' displayKey2='last_name' valueKey='id' onSelect={handleCoordinatorSelect} />
+                <V_SelectObject 
+                    cardTitle='Välj koordinator' 
+                    items={coordinators} 
+                    displayKey='first_name' 
+                    displayKey2='last_name' 
+                    valueKey='id' 
+                    onSelect={handleCoordinatorSelect}
+                    initialValueId={selectedCoordinator?.id}
+                />
 
                 {/* Add customer */}
                 <p>Lägg till säljare</p>

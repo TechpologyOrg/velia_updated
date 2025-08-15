@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 /**
  * V_SelectObject
@@ -10,6 +10,7 @@ import React, { useState } from 'react';
  * - valueKey: String, key in each object to use as value (optional, defaults to 'id')
  * - onSelect: function(selectedObject) - called when an item is selected
  * - selectedValue: value of the currently selected item (optional, for controlled usage)
+ * - initialValueId: ID of the initially selected item (optional, for setting initial selection by ID)
  * - cardTitle: string (optional)
  * - className: string (optional) - extra classes for the card
  */
@@ -20,13 +21,31 @@ function V_SelectObject({
   valueKey = "id",
   onSelect,
   selectedValue,
+  initialValueId,
   cardTitle,
   className = "",
 }) {
   // If parent controls selection, use that, else manage internally
-  const [internalSelected, setInternalSelected] = useState(null);
+  const [internalSelected, setInternalSelected] = useState(() => {
+    // If initialValueId is provided, find the matching item and set it as initial value
+    if (initialValueId && items.length > 0) {
+      const initialItem = items.find(item => getValue(item) === initialValueId);
+      return initialItem ? getValue(initialItem) : null;
+    }
+    return null;
+  });
 
   const getValue = (item) => (valueKey in item ? item[valueKey] : item);
+
+  // Update internal selection when items change and we have an initialValueId
+  useEffect(() => {
+    if (initialValueId && items.length > 0 && !selectedValue) {
+      const initialItem = items.find(item => getValue(item) === initialValueId);
+      if (initialItem) {
+        setInternalSelected(getValue(initialItem));
+      }
+    }
+  }, [items, initialValueId, selectedValue, valueKey]);
 
   const handleSelect = (item) => {
     const value = getValue(item);
