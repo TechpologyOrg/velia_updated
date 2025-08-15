@@ -11,6 +11,7 @@ import AuthenticationController from './controllers/AuthenticationController';
 import { useAuth } from './context/AuthContext';
 import { bindAuthHelpers } from './lib/axiosClient';
 import DashboardGroups from './views/velia/realtor/DashboardGroups';
+import DashboardGroupsCreate from './views/velia/realtor/DashboardGroupsCreate';
 
 export default function App() {
   const auth = useAuth();
@@ -30,6 +31,7 @@ export default function App() {
 
       <Route path='/dashboard' element={<Dashboard />} >
         <Route path='groups' element={<DashboardGroups />} />
+        <Route path='groups/create' element={<DashboardGroupsCreate />} />
       </Route>
     </Routes>
   )

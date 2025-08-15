@@ -1,10 +1,16 @@
 import React, {useState, useEffect} from 'react'
 import api from "../../../lib/axiosClient"
 import { useAuth } from '../../../context/AuthContext'
+import { useNavigate } from 'react-router-dom'
 
 export default function DashboardGroups() {
-  const [groups, setGroups] = useState([])
-  const { loading, isAuthenticated } = useAuth()
+  const [groups, setGroups] = useState([]);
+  const [groupsNext, setGroupsNext] = useState("");
+  const [groupsPrev, setGroupsPrev] = useState("");
+  const [groupsCount, setGroupsCount] = useState(0);
+  const { loading, isAuthenticated } = useAuth();
+
+  const navigate = useNavigate();
 
   useEffect(()=>{
     if (loading) return;
@@ -12,12 +18,38 @@ export default function DashboardGroups() {
     api.get("/groups/mine/")
     .then(resp => {
       console.log(resp.data);
-      setGroups(resp.data ?? [])
+      setGroups(resp.data.results ?? [])
+      setGroupsCount(resp.data.count)
+      setGroupsNext(resp.data.next)
+      setGroupsPrev(resp.data.previous)
     })
     .catch(err=>{
       console.error(err?.response?.data || err.message)
     })
   }, [loading, isAuthenticated])
+
+  const renderGroups = () =>
+  {
+    if(groups.length == 0)
+    {
+      return (
+        <tr className="h-[52px] w-full">
+          <td>No groups found</td>
+        </tr>
+      )
+    }
+
+    var toRet = [];
+    groups.map((group, index) => {
+      toRet.push(
+        <tr>
+          <td>{group.address}</td>
+        </tr>
+      )
+    })
+
+    return toRet;
+  }
 
   return (
     <div className="flex flex-col w-full h-full">
@@ -25,8 +57,27 @@ export default function DashboardGroups() {
       <p className="text-neutral-500">Visa och hantera grupper i ett tydligt listformat.</p>
 
       <div className="flex flex-row gap-4 mt-8">
-        <btn className="bg-black text-white px-4 py-2 text-center flex items-center justify-center text-[14px] font-medium rounded-lg">Skapa grupp</btn>
-        <btn className="bg-white text-black shadow-inner border-[1px] border-neutral-200 px-4 py-2 text-center flex items-center justify-center text-[14px] font-medium rounded-lg">Importera</btn>
+        <btn onClick={()=>{navigate("/dashboard/groups/create")}} className="bg-black text-white px-4 py-2 text-center flex items-center justify-center text-[14px] font-medium rounded-lg">Skapa grupp</btn>
+        {/*<btn className="bg-white text-black shadow-inner border-[1px] border-neutral-200 px-4 py-2 text-center flex items-center justify-center text-[14px] font-medium rounded-lg">Importera</btn>*/}
+      </div>
+
+      <div className="w-full mt-6 overflow-x-auto rounded-xl bg-white">
+        <table className="w-full min-w-[700px] text-left text-sm">
+          <thead className='border-b-[1px] border-neutral-200'>
+            <tr>
+              <th className="pl-6 py-3">Mäklare</th>
+              <th className="pl-4 py-3">Säljare</th>
+              <th className="pl-4 py-3">Koordinator</th>
+              <th className="pl-4 py-3">Adress</th>
+              <th className="pl-4 py-3">Postnmr</th>
+              <th className="pl-4 py-3">Ort</th>
+            </tr>
+          </thead>
+          <tbody>
+            {renderGroups()}
+          </tbody>
+        </table>
+
       </div>
     </div>
   )
