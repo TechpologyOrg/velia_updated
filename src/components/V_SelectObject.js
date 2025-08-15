@@ -72,7 +72,20 @@ function V_SelectObject({
             onClick={() => handleSelect(item)}
             type="button"
           >
-            {`${item[displayKey]} ${item[displayKey2]}` ?? <span className="text-neutral-400">Ingen data</span>}
+            {(() => {
+              const primaryValue = item[displayKey];
+              const secondaryValue = item[displayKey2];
+              
+              if (!primaryValue && !secondaryValue) {
+                return <span className="text-neutral-400">Ingen data</span>;
+              }
+              
+              const displayText = [primaryValue, secondaryValue]
+                .filter(Boolean)
+                .join(' ');
+              
+              return displayText || <span className="text-neutral-400">Ingen data</span>;
+            })()}
           </button>
         ))}
       </div>
