@@ -6,13 +6,12 @@ import V_SelectObject from '../../../components/V_SelectObject'
 
 import { FaPlus, FaEdit, FaCheck, FaTrash } from 'react-icons/fa';
 
-function AddCustomerWindow() {
-    const [users, setUsers] = useState([]);
+function AddCustomerWindow({ customers, setCustomers }) {
     const [editingIndex, setEditingIndex] = useState(null);
 
     // Helper to handle field changes
     const handleFieldChange = (idx, field, value) => {
-        setUsers(prev =>
+        setCustomers(prev =>
             prev.map((user, i) =>
                 i === idx ? { ...user, [field]: value } : user
             )
@@ -21,16 +20,16 @@ function AddCustomerWindow() {
 
     // Add a new user in edit mode
     const handleAddUser = () => {
-        setUsers(prev => [
+        setCustomers(prev => [
             ...prev,
             { fullName: '', personnummer: '', email: '', isNew: true }
         ]);
-        setEditingIndex(users.length);
+        setEditingIndex(customers.length);
     };
 
     // Save edits (for both new and existing)
     const handleSave = (idx) => {
-        setUsers(prev =>
+        setCustomers(prev =>
             prev.map((user, i) =>
                 i === idx ? { ...user, isNew: false } : user
             )
@@ -45,7 +44,7 @@ function AddCustomerWindow() {
 
     // Remove a user
     const handleRemove = (idx) => {
-        setUsers(prev => prev.filter((_, i) => i !== idx));
+        setCustomers(prev => prev.filter((_, i) => i !== idx));
         // If the removed user was being edited, reset editingIndex
         if (editingIndex === idx) {
             setEditingIndex(null);
@@ -57,7 +56,7 @@ function AddCustomerWindow() {
 
     return (
         <div className='w-full p-2 rounded-md bg-neutral-100 flex flex-row overflow-x-scroll relative min-h-[180px]'>
-            {users.map((user, idx) => (
+            {customers.map((user, idx) => (
                 <div
                     key={idx}
                     className="relative flex flex-col bg-white rounded-lg shadow-md p-4 m-2 min-w-[260px] max-w-[280px] border border-neutral-200"
@@ -181,6 +180,13 @@ export default function DashboardGroupsCreate() {
     const createGroup = () => {
         console.log(sessionStorage.getItem("user")["id"])
 
+        // Debug: Check if customers are being received from AddCustomerWindow
+        console.log("Customers received in createGroup:", customers);
+
+        if (!customers || customers.length === 0) {
+            console.warn("No customers to create. Did AddCustomerWindow pass up customers correctly?");
+        }
+
         Promise.all(
             customers.map(customer => {
                 const [first_name, ...rest] = customer.fullName.split(" ");
@@ -243,8 +249,8 @@ export default function DashboardGroupsCreate() {
                 {/* Add customer */}
                 <p>Lägg till säljare</p>
                 <AddCustomerWindow
-                    customers={[]}
-                    setCustomers={()=>{}}
+                    customers={customers}
+                    setCustomers={setCustomers}
                 />
 
             </div>
