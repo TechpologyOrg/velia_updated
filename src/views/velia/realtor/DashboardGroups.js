@@ -50,7 +50,7 @@ export default function DashboardGroups() {
     var toRet = [];
     groups.map((group, index) => {
       toRet.push(
-        <tr>
+        <tr className='h-[42px] cursor-pointer hover:bg-neutral-200 text-start' onClick={()=>{navigate(`/dashboard/groups/${group.id}`)}}>
           <td>{group.realtor.first_name} {group.realtor.last_name}</td>
           <td>{group.customers.length}</td>
           <td>{group.coordinator.first_name} {group.coordinator.last_name}</td>
@@ -78,12 +78,12 @@ export default function DashboardGroups() {
         <table className="w-full min-w-[700px] text-left text-sm">
           <thead className='border-b-[1px] border-neutral-200'>
             <tr>
-              <th className="pl-6 py-3">Mäklare</th>
-              <th className="pl-4 py-3">Säljare</th>
-              <th className="pl-4 py-3">Koordinator</th>
-              <th className="pl-4 py-3">Adress</th>
-              <th className="pl-4 py-3">Postnmr</th>
-              <th className="pl-4 py-3">Ort</th>
+              <th className="pl-1 py-3">Mäklare</th>
+              <th className="pl-1 py-3">Säljare</th>
+              <th className="pl-1 py-3">Koordinator</th>
+              <th className="pl-1 py-3">Adress</th>
+              <th className="pl-1 py-3">Postnmr</th>
+              <th className="pl-1 py-3">Ort</th>
             </tr>
           </thead>
           <tbody>
