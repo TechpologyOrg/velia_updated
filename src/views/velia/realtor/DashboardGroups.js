@@ -3,6 +3,8 @@ import api from "../../../lib/axiosClient"
 import { useAuth } from '../../../context/AuthContext'
 import { useNavigate } from 'react-router-dom'
 
+import { FaPlus, FaEdit, FaCheck, FaTrash } from 'react-icons/fa';
+
 export default function DashboardGroups() {
   const [groups, setGroups] = useState([]);
   const [groupsNext, setGroupsNext] = useState("");
@@ -36,6 +38,16 @@ export default function DashboardGroups() {
     })
   }, [loading, isAuthenticated])
 
+  const deleteGroup = (id) => {
+    api.delete(`/groups/${id}/delete`)
+    .then(resp => {
+      console.log('DashboardGroups: Group deleted successfully:', resp.data);
+    })
+    .catch(err=>{
+      console.error('DashboardGroups: API call failed:', err?.response?.data || err.message)
+    })
+  }
+
   const renderGroups = () =>
   {
     if(groups.length == 0)
@@ -57,6 +69,7 @@ export default function DashboardGroups() {
           <td>{group.address}</td>
           <td>{group.postnummer}</td>
           <td>{group.ort}</td>
+          <td><FaTrash className='cursor-pointer text-red-500' onClick={()=>{deleteGroup(group.id)}} /></td>
         </tr>
       )
     })
@@ -84,6 +97,7 @@ export default function DashboardGroups() {
               <th className="pl-1 py-3">Adress</th>
               <th className="pl-1 py-3">Postnmr</th>
               <th className="pl-1 py-3">Ort</th>
+              <th className="pl-1 py-3">-</th>
             </tr>
           </thead>
           <tbody>
