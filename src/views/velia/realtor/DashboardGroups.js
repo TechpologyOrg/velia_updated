@@ -73,7 +73,7 @@ export default function DashboardGroups() {
           <td>{group.address}</td>
           <td>{group.postnummer}</td>
           <td>{group.ort}</td>
-          <td className='cursor-pointer' onClick={e => { e.stopPropagation(); navigate(`/dashboard/groups/update/${group.id}`)}}><FaTrash /></td>
+          <td className='cursor-pointer' onClick={e => { e.stopPropagation(); navigate(`/dashboard/groups/update/${group.id}`)}}><FaEdit /></td>
           <td className='cursor-pointer text-red-500' onClick={e => { e.stopPropagation(); deleteGroup(group.id);}}><FaTrash /></td>
         </tr>
       )
@@ -102,6 +102,7 @@ export default function DashboardGroups() {
               <th className="pl-1 py-3">Adress</th>
               <th className="pl-1 py-3">Postnmr</th>
               <th className="pl-1 py-3">Ort</th>
+              <th className="pl-1 py-3"> </th>
               <th className="pl-1 py-3">-</th>
             </tr>
           </thead>
