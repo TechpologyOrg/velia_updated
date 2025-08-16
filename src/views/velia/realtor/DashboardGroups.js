@@ -39,7 +39,7 @@ export default function DashboardGroups() {
   }, [loading, isAuthenticated])
 
   const deleteGroup = (id) => {
-    api.delete(`/groups/${id}/delete`)
+    api.delete(`/groups/${id}/delete/`)
     .then(resp => {
       console.log('DashboardGroups: Group deleted successfully:', resp.data);
     })
