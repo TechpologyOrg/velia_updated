@@ -4,8 +4,8 @@ import { FaPlus } from 'react-icons/fa';
 import V_Popup from '../../../components/V_Popup';
 
 export default function DashboardGroupView() {
-    // const { group } = useLocation().state;
-    const group = {
+    const { group } = useLocation().state;
+/*     const group = {
 		"id": 9,
 		"organisation": 1,
 		"address": "Stockholmsvägen 11",
@@ -37,7 +37,7 @@ export default function DashboardGroupView() {
 				"personnummer": "197905317793"
 			}
 		]
-	}
+	} */
 
     const renderCustomers = () => {
         return group.customers.map((customer) => {
