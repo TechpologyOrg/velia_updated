@@ -62,14 +62,25 @@ export default function DashboardGroups() {
     var toRet = [];
     groups.map((group, index) => {
       toRet.push(
-        <tr className='h-[42px] cursor-pointer hover:bg-neutral-200 text-start' onClick={()=>{navigate(`/dashboard/groups/update/${group.id}`)}}>
+        <tr
+          className='h-[42px] cursor-pointer hover:bg-neutral-200 text-start'
+          onClick={() => { navigate(`/dashboard/groups/update/${group.id}`) }}
+        >
           <td>{group.realtor.first_name} {group.realtor.last_name}</td>
           <td>{group.customers.length}</td>
           <td>{group.coordinator.first_name} {group.coordinator.last_name}</td>
           <td>{group.address}</td>
           <td>{group.postnummer}</td>
           <td>{group.ort}</td>
-          <td><FaTrash className='cursor-pointer text-red-500' onClick={()=>{deleteGroup(group.id)}} /></td>
+          <td
+            className='cursor-pointer text-red-500'
+            onClick={e => {
+              e.stopPropagation();
+              deleteGroup(group.id);
+            }}
+          >
+            <FaTrash />
+          </td>
         </tr>
       )
     })
