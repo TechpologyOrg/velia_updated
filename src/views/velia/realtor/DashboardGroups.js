@@ -42,6 +42,7 @@ export default function DashboardGroups() {
     api.delete(`/groups/${id}/delete/`)
     .then(resp => {
       console.log('DashboardGroups: Group deleted successfully:', resp.data);
+      setGroups(groups.filter(group => group.id !== id))
     })
     .catch(err=>{
       console.error('DashboardGroups: API call failed:', err?.response?.data || err.message)
@@ -64,7 +65,7 @@ export default function DashboardGroups() {
       toRet.push(
         <tr
           className='h-[42px] cursor-pointer hover:bg-neutral-200 text-start'
-          onClick={() => { navigate(`/dashboard/groups/update/${group.id}`) }}
+          onClick={() => { navigate(`/dashboard/groups/${group.id}`, {state: {group: group}}) }}
         >
           <td>{group.realtor.first_name} {group.realtor.last_name}</td>
           <td>{group.customers.length}</td>
@@ -72,15 +73,8 @@ export default function DashboardGroups() {
           <td>{group.address}</td>
           <td>{group.postnummer}</td>
           <td>{group.ort}</td>
-          <td
-            className='cursor-pointer text-red-500'
-            onClick={e => {
-              e.stopPropagation();
-              deleteGroup(group.id);
-            }}
-          >
-            <FaTrash />
-          </td>
+          <td className='cursor-pointer' onClick={e => { e.stopPropagation(); navigate(`/dashboard/groups/update/${group.id}`)}}><FaTrash /></td>
+          <td className='cursor-pointer text-red-500' onClick={e => { e.stopPropagation(); deleteGroup(group.id);}}><FaTrash /></td>
         </tr>
       )
     })
