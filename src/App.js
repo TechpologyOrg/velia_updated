@@ -13,6 +13,7 @@ import { bindAuthHelpers } from './lib/axiosClient';
 import DashboardGroups from './views/velia/realtor/DashboardGroups';
 import DashboardGroupsCreate from './views/velia/realtor/DashboardGroupsCreate';
 import DashboardGroupView from './views/velia/realtor/DashboardGroupView';
+import ViewForm from './views/customer/ViewForm';
 
 export default function App() {
   const auth = useAuth();
@@ -36,6 +37,8 @@ export default function App() {
         <Route path='groups/create' element={<DashboardGroupsCreate />} />
         <Route path='groups/update/:id' element={<DashboardGroupsCreate />} />
       </Route>
+
+      <Route path='/customer/view-form' element={<ViewForm />} />
     </Routes>
   )
 }
