@@ -51,19 +51,22 @@ export default function CustomerAuthenticationController() {
                     }
                     
                     console.log("User authenticated successfully:", response.data);
-                    navigate('/customer/dashboard/home', { replace: true });
+                    const organisationName = window.location.pathname.split('/')[1];
+                    navigate(`/${organisationName}/customer/dashboard/home`, { replace: true });
                 })
                 .catch(error => {
                     console.error("Authentication error:", error);
                     setError("Authentication failed. Please try again.");
-                    navigate('/Login', { replace: true });
+                    const organisationName = window.location.pathname.split('/')[1];
+                    navigate(`/${organisationName}/customer/login`, { replace: true });
                 });
             }
             catch(e)
             {
                 console.error("Error during authentication:", e);
                 setError("An unexpected error occurred. Please try again.");
-                navigate('/Login', { replace: true });
+                const organisationName = window.location.pathname.split('/')[1];
+                navigate(`/${organisationName}/customer/login`, { replace: true });
             }
         }
         run();
