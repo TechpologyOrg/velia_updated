@@ -5,7 +5,7 @@ import { Outlet } from 'react-router-dom';
 import { RiGroupLine } from "react-icons/ri";
 import { LuPanelLeft } from "react-icons/lu";
 
-function V_SidebarBtn(props)
+export function V_SidebarBtn(props)
 {
   return (
     <div className="w-full py-2 px-2 rounded-md flex flex-row gap-4 items-center hover:bg-[#00000008] cursor-pointer" onClick={()=>{props.trigger()}}>
