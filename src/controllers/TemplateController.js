@@ -98,7 +98,7 @@ export function GenerateForm({ Form, SetForm, template }) {
             <div className='flex flex-col w-full gap-4'>
                 {Form.questions.map((question, index) => {
                     if (question.type === 'display') {
-                        question.value = template.vars[question.key];
+                        question.value = vars[question.key];
                         return (
                             <div key={question.id || index} className='flex flex-col w-full max-w-[400px] pl-8'>
                                 <label className="mb-1 text-sm font-medium text-gray-700">{question.title}</label>
@@ -194,7 +194,7 @@ export function GenerateForm({ Form, SetForm, template }) {
 
 export function GenerateTemplate({ template, SetTemplate }) {
     // Defensive copy to avoid mutating the original template
-    const safeTemplate = Array.isArray(template) ? template : [];
+    const safeTemplate = Array.isArray(template.answers) ? template.answers : [];
 
     return (
         <div className='flex flex-col w-full h-full'>
@@ -202,6 +202,7 @@ export function GenerateTemplate({ template, SetTemplate }) {
                 <GenerateForm
                     key={form.id || index}
                     Form={form}
+                    vars={template.vars}
                     SetForm={(updatedForm) => {
                         // Always create a new array and new form object to ensure React state updates
                         const updatedTemplate = safeTemplate.map((f, i) =>
