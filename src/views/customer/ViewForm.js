@@ -28,7 +28,7 @@ export default function ViewForm() {
     }, []);
 
     return (
-        <div className='flex flex-col w-full h-full items-center justify-center overflow-y-scroll pb-12'>
+        <div className='flex flex-col w-full h-full items-center justify-center overflow-y-scroll'>
             <GenerateTemplate
                 template={template}
                 SetTemplate={(newTemplate) => {
