@@ -19,6 +19,7 @@ export default function CustomerAuthenticationController() {
                 const idToken = state?.idToken || sessionStorage.getItem('id_token');
                 const searchParams = new URLSearchParams(window.location.search);
                 const organisationId = searchParams.get('oid');
+                console.log("Organisation ID:", organisationId);
                 await api.post(
                     '/auth/bankid/login/organisation/',
                     { id_token: idToken, organisation_id: organisationId },
