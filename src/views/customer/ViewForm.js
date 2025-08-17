@@ -40,7 +40,7 @@ export default function ViewForm() {
     }, []);
 
     return (
-        <div className='flex flex-col w-full h-full items-start justify-center pb-12'>
+        <div className='flex flex-col w-full h-full items-center justify-center pb-12'>
             <GenerateTemplate
                 template={template}
                 SetTemplate={(newTemplate) => {
