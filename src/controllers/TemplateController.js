@@ -91,7 +91,7 @@ export function GenerateForm({ Form, SetForm, template }) {
     }
 
     return (
-        <div className='flex flex-col w-full p-4 overflow-y-scroll'>
+        <div className='flex flex-col w-full p-4'>
             <p className='text-xl font-bold'>{Form.title}</p>
             <p className='text-sm text-neutral-500 mb-4'>{Form.description}</p>
 
