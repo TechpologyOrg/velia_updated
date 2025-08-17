@@ -24,7 +24,8 @@ export default function CustomerDashboardHome() {
     const renderTasks = () => {
         return tasks.map((task) => {
             return (
-                <div className="flex flex-row w-full max-w-3xl h-[160px] bg-white rounded-xl shadow-md overflow-hidden my-4" onClick={() => {navigate(`/${organisation.name}/customer/task/${task.id}`)}}>
+                <div className="flex flex-row w-full max-w-3xl h-[160px] bg-white rounded-xl shadow-md overflow-hidden my-4"
+                    onClick={() => {navigate(`/${organisation.name}/customer/dashboard/task/${task.id}`)}}>
                     {/* Info section */}
                     <div className="flex flex-col flex-1 p-6 justify-center">
                         <h2 className="text-xl font-semibold mb-2">{task.task.title}</h2>
