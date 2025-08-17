@@ -51,6 +51,10 @@ export default function CustomerDashboardHome() {
         <div className="flex flex-col w-full h-full p-8">
             <p className="text-2xl md:text-3xl font-semibold mb-2">Ärenden {tasks.length}</p>
             <p className="text-neutral-500">Visa och hantera dina ärenden i ett tydligt listformat.</p>
+
+            <div className="w-full h-full flex flex-col mt-8">
+                {renderTasks()}
+            </div>
         </div>
     )
 }
