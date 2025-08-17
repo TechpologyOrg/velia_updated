@@ -58,6 +58,8 @@ export default function CustomerAuthenticationController() {
                 .catch(error => {
                     console.error("Authentication error:", error);
                     setError("Authentication failed. Please try again.");
+                    const searchParams = new URLSearchParams(window.location.search);
+                    const organisationName = searchParams.get('organisation');
                     navigate(`/${organisationName}/customer/login`, { replace: true });
                 });
             }
@@ -65,6 +67,8 @@ export default function CustomerAuthenticationController() {
             {
                 console.error("Error during authentication:", e);
                 setError("An unexpected error occurred. Please try again.");
+                const searchParams = new URLSearchParams(window.location.search);
+                const organisationName = searchParams.get('organisation');
                 navigate(`/${organisationName}/customer/login`, { replace: true });
             }
         }
