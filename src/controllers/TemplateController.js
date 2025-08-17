@@ -98,10 +98,11 @@ export function GenerateForm({ Form, SetForm, template }) {
             <div className='flex flex-col w-full gap-4'>
                 {Form.questions.map((question, index) => {
                     if (question.type === 'display') {
+                        question.value = template.vars[question.key];
                         return (
                             <div key={question.id || index} className='flex flex-col w-full max-w-[400px] pl-8'>
                                 <label className="mb-1 text-sm font-medium text-gray-700">{question.title}</label>
-                                <p className="text-sm text-gray-500">{template.vars[question.key]}</p>
+                                <p className="text-sm text-gray-500">{question.value}</p>
                             </div>
                         );
                     } else if (question.type === 'numeric') {
