@@ -17,7 +17,13 @@ export default function CustomerAuthenticationController() {
             try
             {
                 const idToken = state?.idToken || sessionStorage.getItem('id_token');
-                await api.post('/auth/bankid/login/organisation/', { id_token: idToken }, {headers: { 'Content-Type': 'application/json' }})
+                const searchParams = new URLSearchParams(window.location.search);
+                const organisationId = searchParams.get('oid');
+                await api.post(
+                    '/auth/bankid/login/organisation/',
+                    { id_token: idToken, organisation_id: organisationId },
+                    { headers: { 'Content-Type': 'application/json' } }
+                )
                 .then(async (response) => {
                     console.log("Authentication response:", response);
 
