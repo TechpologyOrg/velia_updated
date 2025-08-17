@@ -27,7 +27,7 @@ export default function CustomerDashboardHome() {
                         <h2 className="text-xl font-semibold mb-2">{task.title}</h2>
                         <div className="text-sm text-neutral-600 mb-1">
                             <span className="font-medium">Tilldelad:</span>{" "}
-                            {task.date_assigned ? new Date(task.date_assigned).toLocaleDateString() : "Saknas"}
+                            {task.assigned_at ? new Date(task.assigned_at).toLocaleDateString() : "Saknas"}
                         </div>
                         <div className="text-sm text-neutral-600">
                             <span className="font-medium">Förfallodatum:</span>{" "}
@@ -37,7 +37,7 @@ export default function CustomerDashboardHome() {
                     {/* Image section */}
                     <div className="w-[180px] h-full flex-shrink-0">
                         <img
-                            src={task.realtor.profile_picture_url || "https://placehold.co/180x160?text=Bild"}
+                            src={task.realtor.profile_picture_url}
                             alt={task.realtor.first_name + " " + task.realtor.last_name}
                             className="object-cover w-full h-full"
                         />
