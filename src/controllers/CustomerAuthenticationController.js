@@ -19,7 +19,9 @@ export default function CustomerAuthenticationController() {
                 const idToken = state?.idToken || sessionStorage.getItem('id_token');
                 const searchParams = new URLSearchParams(window.location.search);
                 const organisationId = searchParams.get('oid');
+                const organisationName = searchParams.get('organisation');
                 console.log("Organisation ID:", organisationId);
+                console.log("Organisation Name:", organisationName);
                 await api.post(
                     '/auth/bankid/login/organisation/',
                     { id_token: idToken, organisation_id: organisationId },
@@ -51,13 +53,11 @@ export default function CustomerAuthenticationController() {
                     }
                     
                     console.log("User authenticated successfully:", response.data);
-                    const organisationName = searchParams.get('organisation');
                     navigate(`/${organisationName}/customer/dashboard/home`, { replace: true });
                 })
                 .catch(error => {
                     console.error("Authentication error:", error);
                     setError("Authentication failed. Please try again.");
-                    const organisationName = searchParams.get('organisation');
                     navigate(`/${organisationName}/customer/login`, { replace: true });
                 });
             }
@@ -65,7 +65,6 @@ export default function CustomerAuthenticationController() {
             {
                 console.error("Error during authentication:", e);
                 setError("An unexpected error occurred. Please try again.");
-                const organisationName = searchParams.get('organisation');
                 navigate(`/${organisationName}/customer/login`, { replace: true });
             }
         }
