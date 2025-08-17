@@ -48,7 +48,7 @@ export default function App() {
 
       <Route path="/:string/customer/dashboard" element={<CustomerDashboard />} >
         <Route path='home' element={<CustomerDashboardHome />} />
-        <Route path='task/:id' element={<ViewForm />} />
+        <Route path='customer/task/:id' element={<ViewForm />} />
       </Route>
 
       <Route path='/customer/view-form' element={<ViewForm />} />
