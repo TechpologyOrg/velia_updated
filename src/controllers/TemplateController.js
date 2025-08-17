@@ -91,7 +91,7 @@ export function GenerateForm({ Form, SetForm, template }) {
     }
 
     return (
-        <div className='flex flex-col w-full py-4'>
+        <div className='flex flex-col w-full p-4 overflow-y-scroll'>
             <p className='text-xl font-bold'>{Form.title}</p>
             <p className='text-sm text-neutral-500 mb-4'>{Form.description}</p>
 
@@ -170,6 +170,21 @@ export function GenerateForm({ Form, SetForm, template }) {
                             </div>
                         )
                     }
+                    else if(question.type === 'date') {
+                        return (
+                            <div key={question.id || index} className='flex flex-col w-full max-w-[400px] pl-8'>
+                                <label className="mb-1 text-sm font-medium text-gray-700">{question.title}</label>
+                                <input
+                                    type="date"
+                                    value={question.value}
+                                    onChange={(e) => {
+                                        Form["questions"][index]["value"] = e.target.value;
+                                        SetForm(Form);
+                                    }}
+                                />
+                            </div>
+                        )
+                    }
                 })}
             </div>
         </div>
@@ -181,7 +196,7 @@ export function GenerateTemplate({ template, SetTemplate }) {
     const safeTemplate = Array.isArray(template) ? template : [];
 
     return (
-        <div className='flex flex-col w-[800px] h-full overflow-y-scroll p-4'>
+        <div className='flex flex-col w-[800px] h-full'>
             {safeTemplate.map((form, index) => (
                 <GenerateForm
                     key={form.id || index}
