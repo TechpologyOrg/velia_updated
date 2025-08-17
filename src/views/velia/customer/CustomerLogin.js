@@ -18,7 +18,8 @@ export default function CustomerLogin() {
         const organisationId = searchParams.get('oid');
         const organisationName = window.location.pathname.split('/')[1];
 
-        sessionStorage.setItem('returnTo', `/controllers/customer/authenticate?oid=${organisationId};organisation=${organisationName}`);
+        // No, use & to separate query parameters, not ;
+        sessionStorage.setItem('returnTo', `/controllers/customer/authenticate?oid=${organisationId}&organisation=${organisationName}`);
 
         console.log("Organisation ID:", organisationId);
         console.log("Organisation Name:", organisationName);
