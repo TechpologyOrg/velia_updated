@@ -14,10 +14,10 @@ export default function CustomerLogin() {
     const [submitting, setSubmitting] = useState(false);
 
     const startBankIdLogin = async (thisDevice = false) => {
-        const organisation = JSON.parse(sessionStorage.getItem('user')).user.organisation;
-        const organisationId = organisation.id;
-        console.log("Organisation ID:", organisation.id);
-        sessionStorage.setItem('returnTo', '/controllers/customer/authenticate?oid=' + organisation.id);
+        const searchParams = new URLSearchParams(window.location.search);
+        const organisationId = searchParams.get('oid');
+        console.log("Organisation ID:", organisationId);
+        sessionStorage.setItem('returnTo', '/controllers/customer/authenticate?oid=' + organisationId);
 
         await loginWithRedirect({
             acr_values: thisDevice ? "urn:grn:authn:se:bankid:same-device" : "urn:grn:authn:se:bankid:another-device:qr"
