@@ -8,7 +8,7 @@ export default function CustomerDashboardHome() {
     const [tasks, setTasks] = useState([]);
 
     useEffect(() => {
-        api.get(`/api/v1/customer-tasks`)
+        api.get(`/customer-tasks/`)
         .then((res) => {
             console.log(res.data);
             setTasks(res.data);
