@@ -17,7 +17,7 @@ export default function CustomerDashboard() {
             {
               (panelOpen) ?
                 <div className="flex flex-col w-[240px] h-full p-4 bg-neutral-100 shadow-inner border-r-[1px] border-neutral-200">
-                  <div className="flex flex-row w-full gap-2 mb-8 items-center">
+                  <div className="flex flex-row w-full gap-2 mb-8 items-center justify-center">
                     <img src={organisation.logo_url} alt={organisation.name} className='h-[40px]' />
                   </div>
 
