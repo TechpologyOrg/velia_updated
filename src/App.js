@@ -15,6 +15,11 @@ import DashboardGroupsCreate from './views/velia/realtor/DashboardGroupsCreate';
 import DashboardGroupView from './views/velia/realtor/DashboardGroupView';
 import ViewForm from './views/customer/ViewForm';
 
+import CustomerAuthenticationController from './controllers/CustomerAuthenticationController';
+import CustomerLogin from './views/velia/customer/CustomerLogin';
+import CustomerDashboard from './views/velia/customer/CustomerDashboard';
+import CustomerDashboardHome from './views/velia/customer/CustomerDashboardHome';
+
 export default function App() {
   const auth = useAuth();
 
@@ -30,12 +35,19 @@ export default function App() {
 
       <Route path='/criipto/callback' element={<Callback />} />
       <Route path='/controllers/authenticate' element={<AuthenticationController />} />
+      <Route path='/controllers/customer/authenticate' element={<CustomerAuthenticationController />} />
 
       <Route path='/dashboard' element={<Dashboard />} >
         <Route path='groups' element={<DashboardGroups />} />
         <Route path='groups/:id' element={<DashboardGroupView />} />
         <Route path='groups/create' element={<DashboardGroupsCreate />} />
         <Route path='groups/update/:id' element={<DashboardGroupsCreate />} />
+      </Route>
+
+      <Route path="/:string/customer/login" element={<CustomerLogin />} />
+
+      <Route path="/:string/customer/dashboard" element={<CustomerDashboard />} >
+        <Route path='home' element={<CustomerDashboardHome />} />
       </Route>
 
       <Route path='/customer/view-form' element={<ViewForm />} />
