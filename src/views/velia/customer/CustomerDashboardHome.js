@@ -11,9 +11,41 @@ export default function CustomerDashboardHome() {
         api.get(`/customer-tasks/`)
         .then((res) => {
             console.log(res.data.results);
-            setTasks(res.data);
+            setTasks(res.data.results);
+        })
+        .catch((err) => {
+            console.log(err);
         });
     }, []);
+
+    const renderTasks = () => {
+        return tasks.map((task) => {
+            return (
+                <div className="flex flex-row w-full max-w-3xl h-[160px] bg-white rounded-xl shadow-md overflow-hidden my-4">
+                    {/* Info section */}
+                    <div className="flex flex-col flex-1 p-6 justify-center">
+                        <h2 className="text-xl font-semibold mb-2">{task.title}</h2>
+                        <div className="text-sm text-neutral-600 mb-1">
+                            <span className="font-medium">Tilldelad:</span>{" "}
+                            {task.date_assigned ? new Date(task.date_assigned).toLocaleDateString() : "Saknas"}
+                        </div>
+                        <div className="text-sm text-neutral-600">
+                            <span className="font-medium">Förfallodatum:</span>{" "}
+                            {task.due_date ? new Date(task.due_date).toLocaleDateString() : "Saknas"}
+                        </div>
+                    </div>
+                    {/* Image section */}
+                    <div className="w-[180px] h-full flex-shrink-0">
+                        <img
+                            src={task.realtor.profile_picture_url || "https://placehold.co/180x160?text=Bild"}
+                            alt={task.realtor.first_name + " " + task.realtor.last_name}
+                            className="object-cover w-full h-full"
+                        />
+                    </div>
+                </div>
+            )
+        })
+    }
 
     return (
         <div className="flex flex-col w-full h-full p-8">
