@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom';
 import api from '../../../lib/axiosClient';
 
 export default function CustomerDashboardHome() {
+    const navigate = useNavigate();
+
     const user = JSON.parse(sessionStorage.getItem('user')).user;
     const organisation = user.organisation;
 
     const [tasks, setTasks] = useState([]);
 
     useEffect(() => {
-        api.get(`/customer-tasks/`)
+        api.get(`/task-responses/`)
         .then((res) => {
             console.log(res.data.results);
             setTasks(res.data.results);
@@ -21,7 +24,7 @@ export default function CustomerDashboardHome() {
     const renderTasks = () => {
         return tasks.map((task) => {
             return (
-                <div className="flex flex-row w-full max-w-3xl h-[160px] bg-white rounded-xl shadow-md overflow-hidden my-4">
+                <div className="flex flex-row w-full max-w-3xl h-[160px] bg-white rounded-xl shadow-md overflow-hidden my-4" onClick={() => {navigate(`/customer/dashboard/task/${task.id}`)}}>
                     {/* Info section */}
                     <div className="flex flex-col flex-1 p-6 justify-center">
                         <h2 className="text-xl font-semibold mb-2">{task.title}</h2>
