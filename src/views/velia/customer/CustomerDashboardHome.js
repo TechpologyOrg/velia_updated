@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import api from '../../../lib/axiosClient';
 
 export default function CustomerDashboardHome() {
     const user = JSON.parse(sessionStorage.getItem('user')).user;
@@ -7,6 +8,11 @@ export default function CustomerDashboardHome() {
     const [tasks, setTasks] = useState([]);
 
     useEffect(() => {
+        api.get(`/api/v1/customer-tasks/`)
+        .then((res) => {
+            console.log(res.data);
+            setTasks(res.data);
+        });
     }, []);
 
     return (
