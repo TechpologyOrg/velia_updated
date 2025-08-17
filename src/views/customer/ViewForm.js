@@ -13,7 +13,7 @@ export default function ViewForm() {
             .then((res) => {
                 if (res.data && res.data.answers) {
                     // add a key to the template named "vars" with the value being an object
-                    setTemplate({...res.data.answers, vars: {
+                    setTemplate({answers: res.data.answers, vars: {
                         "customer_full_name": res.data.customer.first_name + " " + res.data.customer.last_name,
                         "customer_personnummer": res.data.customer.personnummer,
                         "customer_email": res.data.customer.email,
