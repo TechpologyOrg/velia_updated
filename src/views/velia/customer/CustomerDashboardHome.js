@@ -40,7 +40,7 @@ export default function CustomerDashboardHome() {
                     {/* Image section */}
                     <div className="w-[180px] h-full flex-shrink-0">
                         <img
-                            src={task.realtor.profile_picture_url}
+                            src={task.task.realtor.profile_picture_url}
                             alt={task.realtor.first_name + " " + task.realtor.last_name}
                             className="object-cover w-full h-full"
                         />
