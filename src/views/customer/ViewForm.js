@@ -6,30 +6,13 @@ import api from '../../lib/axiosClient';
 export default function ViewForm() {
     const { id } = useParams();
 
-    const [template, setTemplate] = useState(
-        [
-            {
-                "id": 0,
-                "title": "are you gay",
-                "type": "form",
-                "questions":
-                    [
-                        {
-                            "id": 0, "title": "do you like men", "type": "choice", "choices": [
-                                "yes", "very much", "a lot", "of course"
-                            ], "value": ""
-                        },
-                        { "id": 1, "title": "how many men have u slept with", "type": "numeric", "value": 10 }
-                    ]
-            }
-        ]
-    );
+    const [template, setTemplate] = useState([]);
 
     useEffect(() => {
         api.get(`/task-responses/${id}/`)
             .then((res) => {
-                if (res.data && res.data.results) {
-                    setTemplate(res.data.results);
+                if (res.data && res.data.answers) {
+                    setTemplate(res.data.answers);
                 } else {
                     console.error("No template found in response:", res.data);
                 }
