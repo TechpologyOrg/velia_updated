@@ -196,7 +196,7 @@ export function GenerateTemplate({ template, SetTemplate }) {
     const safeTemplate = Array.isArray(template) ? template : [];
 
     return (
-        <div className='flex flex-col w-[800px] h-full'>
+        <div className='flex flex-col w-full h-full'>
             {safeTemplate.map((form, index) => (
                 <GenerateForm
                     key={form.id || index}
