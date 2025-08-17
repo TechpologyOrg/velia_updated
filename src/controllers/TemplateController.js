@@ -36,7 +36,7 @@ import V_Input from '../components/V_Input';
   ]
  */
 
-export function GenerateForm({ Form, SetForm, template }) {
+export function GenerateForm({ Form, SetForm, template, vars }) {
     // Compute visibility without causing re-renders
     let visible = false;
 
