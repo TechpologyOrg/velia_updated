@@ -70,7 +70,7 @@ export default function DashboardGroupView() {
     }, []);
 
     const assignTask = (template) => {
-        api.post(`/tasks/bulk_assign/`, {
+        api.post(`/tasks/`, {
             template_id: template.id,
             group_id: group.id,
             is_shared: sharedTask,
@@ -158,8 +158,10 @@ export default function DashboardGroupView() {
                                                 <button
                                                     className="px-4 py-2 bg-black text-white rounded-md"
                                                     onClick={() => {
-                                                        // Convert dueDate to ISO string if set, else undefined
-                                                        let dueDateISO = dueDate ? new Date(dueDate).toISOString() : undefined;
+                                                        // Convert dueDate to correct ISO 8601 format (YYYY-MM-DDTHH:mm)
+                                                        let dueDateISO = dueDate
+                                                            ? new Date(dueDate).toISOString().slice(0, 16)
+                                                            : undefined;
                                                         assignTask({
                                                             ...template,
                                                             shared: sharedTask,
