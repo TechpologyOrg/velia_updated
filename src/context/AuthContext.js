@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useRef, useState, useCallback } from 'react';
 
-const REFRESH_ENDPOINT = 'https://api.velia.se/api/token/refresh/';
+const REFRESH_ENDPOINT = 'https://api.velia.se/api/v1/token/refresh/';
 const LOGOUT_ENDPOINT  = 'https://api.velia.se/api/v1/auth/logout';
 const STORAGE_KEY = 'velia_refresh_token';
 
