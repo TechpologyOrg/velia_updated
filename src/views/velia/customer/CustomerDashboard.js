@@ -13,7 +13,7 @@ export default function CustomerDashboard() {
   const organisation = user.organisation;
 
   return (
-    <div className='w-full h-screen flex flex-col md:px-[20%] px-4'>
+    <div className='w-full h-full md:h-screen flex flex-col md:px-[20%] px-4'>
       <div className='flex flex-row items-center justify-between py-8'>
         <img src={organisation.logo_url} alt={organisation.name} className='h-[40px]' />
       </div>
