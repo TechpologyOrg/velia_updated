@@ -85,6 +85,10 @@ export default function DashboardGroupView() {
         })
     }
 
+    const [expandedTemplateId, setExpandedTemplateId] = useState(null);
+    const [sharedTask, setSharedTask] = useState(false);
+    const [dueDate, setDueDate] = useState('');
+
     const renderPopup = () => {
         if (taskTemplates.length === 0) {
             return (
