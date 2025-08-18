@@ -36,7 +36,7 @@ export default function ViewForm() {
     const updateAnswers = () => 
     {
         setSaveStatus("saving");
-        api.post(`/task-responses/${id}/`, {
+        api.put(`/task-responses/${id}/`, {
             answers: template.answers,
             status: status
         })
@@ -125,7 +125,15 @@ export default function ViewForm() {
             </div>
             
             {/* Button Container */}
-            <div className='mt-6 flex justify-center'>
+            <div className='mt-6 flex justify-center gap-4'>
+                <button
+                    className='px-6 py-3 bg-black hover:bg-gray-800 transition-colors duration-200 cursor-pointer text-white rounded-lg font-medium text-base shadow-lg hover:shadow-xl transform hover:scale-105'
+                    onClick={() => {
+                        updateAnswers();
+                    }}
+                >
+                    Spara
+                </button>
                 <button
                     className='px-6 py-3 bg-black hover:bg-gray-800 transition-colors duration-200 cursor-pointer text-white rounded-lg font-medium text-base shadow-lg hover:shadow-xl transform hover:scale-105'
                     onClick={() => {
