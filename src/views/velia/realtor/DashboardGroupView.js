@@ -52,27 +52,55 @@ export default function DashboardGroupView() {
 
     const [isPopupOpen, setIsPopupOpen] = useState(false);
 
-    const renderPopup = () => {
-        return (
-            <V_Popup
-                isOpen={isPopupOpen}
-                onClose={() => setIsPopupOpen(false)}
-                title="Lägg till ärende"
-            >
-                <div className='flex flex-col overflow-y-scroll w-full h-full'>
-                    <div className='flex flex-row items-center justify-between py-3 px-2 hover:bg-neutral-200 rounded-md cursor-pointer'
-                    onClick={() => {
-                        setIsPopupOpen(false);
-                    }}
-                    >
-                        <p>KYC - Kundkännedom</p>
-                        <FaPlus size={16} className="mr-1" />
-                    </div>
+    const [taskTemplates, setTaskTemplates] = useState([]);
+    const getTaskTemplates = () => {
+        api.get(`/task-templates/`)
+        .then(resp => {
+            console.log(resp.data);
+            setTaskTemplates(resp.data.results);
+        })
+        .catch(err => {
+            console.error(err);
+        })
+    }
 
-                    <p className='text-sm text-neutral-500 self-center mt-4'>Inga mer ärenden att lägga till</p>
-                </div>
-            </V_Popup>
-        )
+    useEffect(() => {
+        getTaskTemplates();
+    }, []);
+
+    const renderPopup = () => {
+        if (taskTemplates.length === 0) {
+            return <p className='text-sm text-neutral-500 self-center mt-4'>Inga mer ärenden att lägga till</p>
+        }
+        else {
+            return (
+                <V_Popup
+                    isOpen={isPopupOpen}
+                    onClose={() => setIsPopupOpen(false)}
+                    title="Lägg till ärende"
+                >
+
+                    <div className='flex flex-col overflow-y-scroll w-full h-full'>
+                        {taskTemplates.map((template) => {
+                            return (
+                                <div className='flex flex-row items-center justify-between py-3 px-2 hover:bg-neutral-200 rounded-md cursor-pointer'
+                                    key={template.id}
+                                    onClick={() => {
+                                        setIsPopupOpen(false);
+                                    }}
+                                >
+                                    <div className='flex flex-col'>
+                                        <p className='text-md text-neutral-500 font-semibold'>{template.title}</p>
+                                        <p className='text-sm text-neutral-500'>{template.description}</p>
+                                    </div>
+                                    <FaPlus size={16} className="mr-1" />
+                                </div>
+                            )
+                        })}
+                    </div>
+                </V_Popup>
+            )
+        }
     }
 
     return (
