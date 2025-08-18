@@ -198,7 +198,7 @@ export function GenerateTemplate({ template, SetTemplate }) {
     const [pageIndex, setPageIndex] = useState(0);
 
     return (
-        <div className='flex flex-col w-full h-full'>
+        <div className='flex flex-col w-full h-full justify-between'>
             {safeTemplate.map((form, index) => {
                 if(index === pageIndex){
                     return (
@@ -218,12 +218,14 @@ export function GenerateTemplate({ template, SetTemplate }) {
                     )
                 }
             })}
-            <div className='w-full h-2 bg-gray-200 rounded-full my-4'>
-                <div className='h-full bg-black rounded-full' style={{width: `${(pageIndex / safeTemplate.length) * 100}%`}}></div>
-            </div>
-            <div className='w-full flex flex-row items-center justify-between'>
-                <button className='bg-black text-white px-4 py-2 rounded-md' onClick={() => {setPageIndex(pageIndex - 1)}}>Back</button>
-                <button className='bg-black text-white px-4 py-2 rounded-md' onClick={() => {setPageIndex(pageIndex + 1)}}>Next</button>
+            <div className='flex flex-col w-full h-full items-center justify-center'>
+                <div className='w-full h-2 bg-gray-200 rounded-full my-4'>
+                    <div className='h-full bg-black rounded-full' style={{width: `${(pageIndex / safeTemplate.length) * 100}%`}}></div>
+                </div>
+                <div className='w-full flex flex-row items-center justify-between'>
+                    <button className='bg-black text-white px-4 py-2 rounded-md' onClick={() => {setPageIndex(pageIndex - 1)}}>Back</button>
+                    <button className='bg-black text-white px-4 py-2 rounded-md' onClick={() => {setPageIndex(pageIndex + 1)}}>Next</button>
+                </div>
             </div>
         </div>
     );
