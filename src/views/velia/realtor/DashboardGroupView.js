@@ -70,9 +70,15 @@ export default function DashboardGroupView() {
     }, []);
 
     const assignTask = (template) => {
-        api.post(`/task-responses/`, {
-            task: template.id,
-            group: group.id
+        api.post(`/tasks/bulk_assign/`, {
+            template_id: template.id,
+            group_id: group.id,
+            is_shared: sharedTask,
+            due_date: dueDate,
+            title: template.title,
+            description: template.description,
+            status: "pending",
+            questions: template.questions
         })
         .then(resp => {
             console.log(resp.data);
