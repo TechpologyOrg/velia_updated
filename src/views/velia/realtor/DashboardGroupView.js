@@ -70,11 +70,14 @@ export default function DashboardGroupView() {
     }, []);
 
     const assignTask = (template) => {
+        // Convert dueDate to ISO format if it exists
+        const dueDateISO = dueDate ? new Date(dueDate).toISOString() : undefined;
+        
         api.post(`/tasks/`, {
             template_id: template.id,
             group_id: group.id,
             is_shared: sharedTask,
-            due_date: dueDate,
+            due_date: dueDateISO,
             title: template.title,
             description: template.description,
             status: "pending",
@@ -158,15 +161,7 @@ export default function DashboardGroupView() {
                                                 <button
                                                     className="px-4 py-2 bg-black text-white rounded-md"
                                                     onClick={() => {
-                                                        // Convert dueDate to correct ISO 8601 format (YYYY-MM-DDTHH:mm)
-                                                        let dueDateISO = dueDate
-                                                            ? new Date(dueDate).toISOString().slice(0, 16)
-                                                            : undefined;
-                                                        assignTask({
-                                                            ...template,
-                                                            shared: sharedTask,
-                                                            due_date: dueDateISO
-                                                        });
+                                                        assignTask(template);
                                                         setExpandedTemplateId(null);
                                                     }}
                                                 >
