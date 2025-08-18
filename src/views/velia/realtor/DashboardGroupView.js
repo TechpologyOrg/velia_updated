@@ -1,7 +1,8 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 import { FaPlus } from 'react-icons/fa';
 import V_Popup from '../../../components/V_Popup';
+import api from '../../../lib/axiosClient';
 
 export default function DashboardGroupView() {
     const { group } = useLocation().state;
