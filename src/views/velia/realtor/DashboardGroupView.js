@@ -69,6 +69,22 @@ export default function DashboardGroupView() {
         getTaskTemplates();
     }, []);
 
+    const assignTask = (template) => {
+        api.post(`/task-responses/`, {
+            task: template.id,
+            group: group.id
+        })
+        .then(resp => {
+            console.log(resp.data);
+        })
+        .catch(err => {
+            console.error(err);
+        })
+        .finally(() => {
+            setIsPopupOpen(false);
+        })
+    }
+
     const renderPopup = () => {
         if (taskTemplates.length === 0) {
             return (
@@ -96,6 +112,7 @@ export default function DashboardGroupView() {
                                     key={template.id}
                                     onClick={() => {
                                         setIsPopupOpen(false);
+                                        assignTask(template);
                                     }}
                                 >
                                     <div className='flex flex-col'>
