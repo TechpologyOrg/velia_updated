@@ -71,7 +71,15 @@ export default function DashboardGroupView() {
 
     const renderPopup = () => {
         if (taskTemplates.length === 0) {
-            return <p className='text-sm text-neutral-500 self-center mt-4'>Inga mer ärenden att lägga till</p>
+            return (
+                <V_Popup
+                    isOpen={isPopupOpen}
+                    onClose={() => setIsPopupOpen(false)}
+                    title="Lägg till ärende"
+                >
+                    <p className='text-sm text-neutral-500 self-center mt-4'>Inga mer ärenden att lägga till</p>
+                </V_Popup>
+            )
         }
         else {
             return (
