@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
+import React, { createContext, useContext, useEffect, useRef, useState, useCallback } from 'react';
 
 const REFRESH_ENDPOINT = 'https://api.velia.se/api/token/refresh/';
 const LOGOUT_ENDPOINT  = 'https://api.velia.se/api/v1/auth/logout';
@@ -112,22 +112,22 @@ export function AuthProvider({ children }) {
     return refreshInFlight.current;
   }
 
-  async function login({ access, refresh, user: serverUser }) {
+  const login = useCallback(async ({ access, refresh, user: serverUser }) => {
     // Call this after your AuthenticationController hits Django and gets tokens
     if (!access || !refresh) throw new Error('Missing tokens');
     sessionStorage.setItem(STORAGE_KEY, refresh);
     hydrateFromAccessToken(access, serverUser);
-  }
+  }, []);
 
-  async function logout() {
+  const logout = useCallback(async () => {
     try { await fetch(LOGOUT_ENDPOINT, { method: 'POST' }); } catch {}
     sessionStorage.removeItem(STORAGE_KEY);
     setAccessToken(null);
     setUser(null);
     clearTimeout(refreshTimerId.current);
-  }
+  }, []);
 
-  async function getValidAccessToken() {
+  const getValidAccessToken = useCallback(async () => {
     // If no access token but we have a refresh token, try to refresh
     if (!accessToken) {
       const rt = sessionStorage.getItem(STORAGE_KEY);
@@ -155,7 +155,7 @@ export function AuthProvider({ children }) {
       catch { await logout(); return null; }
     }
     return accessToken;
-  }
+  }, [accessToken, logout]);
 
   return (
     <AuthContext.Provider value={{

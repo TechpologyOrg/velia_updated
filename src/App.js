@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom';
 
 import Home from './views/Home';
@@ -23,10 +23,13 @@ import CustomerDashboardHome from './views/velia/customer/CustomerDashboardHome'
 export default function App() {
   const auth = useAuth();
 
-  bindAuthHelpers({
-    getValidAccessToken: auth.getValidAccessToken,
-    onUnauthorized: auth.logout
-  });
+  // Bind auth helpers only once when the component mounts
+  useEffect(() => {
+    bindAuthHelpers({
+      getValidAccessToken: auth.getValidAccessToken,
+      onUnauthorized: auth.logout
+    });
+  }, [auth.getValidAccessToken, auth.logout]);
 
   return (
     <Routes>

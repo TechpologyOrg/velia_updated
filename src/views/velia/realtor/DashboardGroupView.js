@@ -108,19 +108,68 @@ export default function DashboardGroupView() {
                     <div className='flex flex-col overflow-y-scroll w-full h-full'>
                         {taskTemplates.map((template) => {
                             return (
-                                <div className='flex flex-row items-center justify-between py-3 px-2 hover:bg-neutral-200 rounded-md cursor-pointer'
-                                    key={template.id}
-                                    onClick={() => {
-                                        setIsPopupOpen(false);
-                                        assignTask(template);
-                                    }}
-                                >
-                                    <div className='flex flex-col'>
-                                        <p className='text-md text-neutral-500 font-semibold'>{template.title}</p>
-                                        <p className='text-sm text-neutral-500'>{template.description}</p>
+                                <React.Fragment key={template.id}>
+                                    <div
+                                        className='flex flex-row items-center justify-between py-3 px-2 hover:bg-neutral-200 rounded-md cursor-pointer'
+                                        onClick={() => {
+                                            setExpandedTemplateId(expandedTemplateId === template.id ? null : template.id);
+                                            setSharedTask(false);
+                                            setDueDate('');
+                                        }}
+                                    >
+                                        <div className='flex flex-col'>
+                                            <p className='text-md text-neutral-500 font-semibold'>{template.title}</p>
+                                            <p className='text-sm text-neutral-500'>{template.description}</p>
+                                        </div>
+                                        <FaPlus size={16} className="mr-1" />
                                     </div>
-                                    <FaPlus size={16} className="mr-1" />
-                                </div>
+                                    {expandedTemplateId === template.id && (
+                                        <div className="animate-slide-down flex flex-col gap-4 bg-neutral-100 rounded-md px-4 py-4 mt-2 mb-2 border border-neutral-200">
+                                            <div className="flex flex-row items-center gap-4">
+                                                <label className="flex items-center gap-2 text-sm text-neutral-700">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={sharedTask}
+                                                        onChange={e => setSharedTask(e.target.checked)}
+                                                    />
+                                                    Dela ärende (shared task)
+                                                </label>
+                                                <label className="flex items-center gap-2 text-sm text-neutral-700">
+                                                    Deadline:
+                                                    <input
+                                                        type="datetime-local"
+                                                        value={dueDate}
+                                                        onChange={e => setDueDate(e.target.value)}
+                                                        className="border border-neutral-300 rounded px-2 py-1"
+                                                    />
+                                                </label>
+                                            </div>
+                                            <div className="flex flex-row gap-2">
+                                                <button
+                                                    className="px-4 py-2 bg-black text-white rounded-md"
+                                                    onClick={() => {
+                                                        // Convert dueDate to ISO string if set, else undefined
+                                                        let dueDateISO = dueDate ? new Date(dueDate).toISOString() : undefined;
+                                                        assignTask({
+                                                            ...template,
+                                                            shared: sharedTask,
+                                                            due_date: dueDateISO
+                                                        });
+                                                        setExpandedTemplateId(null);
+                                                    }}
+                                                >
+                                                    Lägg till
+                                                </button>
+                                                <button
+                                                    className="px-4 py-2 bg-neutral-300 text-black rounded-md"
+                                                    onClick={() => setExpandedTemplateId(null)}
+                                                >
+                                                    Avbryt
+                                                </button>
+                                            </div>
+                                        </div>
+                                    )}
+                                </React.Fragment>
                             )
                         })}
                     </div>
