@@ -32,7 +32,7 @@ export default function ViewForm() {
 
     return (
         <div className='flex flex-col w-full h-full items-center justify-center'>
-            <div className='flex flex-col w-[600px] h-full items-center justify-center overflow-y-scroll'>
+            <div className='flex flex-col w-[600px] min-h-[800px] items-center justify-center overflow-y-scroll'>
                 <p className='text-2xl font-bold'>{template.title}</p>
                 <p className='text-sm text-neutral-500 mb-4'>{template.description}</p>
                 <GenerateTemplate
@@ -42,15 +42,15 @@ export default function ViewForm() {
                         setTemplate([...newTemplate]);
                     }}
                 />
-                <button
-                    className='px-4 py-2 bg-black cursor-pointer text-white rounded-md w-[180px] self-center flex items-center justify-center gap-2'
-                    onClick={() => {
-                        console.log("Current template state:", template);
-                    }}
-                >
-                    Klar
-                </button>
             </div>
+            <button
+                className='px-4 py-2 bg-black cursor-pointer text-white rounded-md w-[180px] self-center flex items-center justify-center gap-2'
+                onClick={() => {
+                    console.log("Current template state:", template);
+                }}
+            >
+                Klar
+            </button>
         </div>
     )
 }
