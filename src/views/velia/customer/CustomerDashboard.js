@@ -18,7 +18,7 @@ export default function CustomerDashboard() {
         <img src={organisation.logo_url} alt={organisation.name} className='h-[40px]' />
       </div>
 
-      <div className='w-full h-full overflow-y-scroll'>
+      <div className='w-full flex-1 overflow-y-scroll'>
         <Outlet />
       </div>
     </div>
