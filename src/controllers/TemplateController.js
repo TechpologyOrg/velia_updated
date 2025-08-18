@@ -217,13 +217,13 @@ export function GenerateForm({ Form, SetForm, template, vars }) {
     )
 }
 
-export function GenerateTemplate({ template, SetTemplate }) {
+export function GenerateTemplate({ template, SetTemplate, onFormChange }) {
     // Defensive copy to avoid mutating the original template
     const safeTemplate = Array.isArray(template.answers) ? template.answers : [];
     const [pageIndex, setPageIndex] = useState(0);
 
     return (
-        <div className='flex flex-col w-full h-full justify-between'>
+        <div className='flex flex-col w-full'>
             {safeTemplate.map((form, index) => {
                 if(index === pageIndex){
                     return (
@@ -240,6 +240,10 @@ export function GenerateTemplate({ template, SetTemplate }) {
                                     )
                                 };
                                 SetTemplate(updatedTemplate);
+                                // Notify parent component that form has changed
+                                if (onFormChange) {
+                                    onFormChange();
+                                }
                             }}
                             template={safeTemplate}
                         />
@@ -247,8 +251,8 @@ export function GenerateTemplate({ template, SetTemplate }) {
                 }
                 return null; // Explicitly return null for non-active indices
             })}
-            <div className='flex flex-col w-full h-full items-center justify-center'>
-                <div className='w-full h-2 bg-gray-200 rounded-full my-4'>
+            <div className='flex flex-col w-full items-center justify-center mt-6'>
+                <div className='w-full h-2 bg-gray-200 rounded-full mb-4'>
                     <div className='h-full bg-black rounded-full' style={{width: `${(pageIndex / safeTemplate.length) * 100}%`}}></div>
                 </div>
                 <div className='w-full flex flex-row items-center justify-between'>

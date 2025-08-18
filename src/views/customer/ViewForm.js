@@ -7,6 +7,9 @@ export default function ViewForm() {
     const { id } = useParams();
 
     const [template, setTemplate] = useState([]);
+    const [status, setStatus] = useState("pending");
+    const [saveStatus, setSaveStatus] = useState("saved"); // "saved", "unsaved", "saving"
+    const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
     useEffect(() => {
         api.get(`/task-responses/${id}/`)
@@ -30,27 +33,109 @@ export default function ViewForm() {
             });
     }, []);
 
+    const updateAnswers = () => 
+    {
+        setSaveStatus("saving");
+        api.post(`/task-responses/${id}/`, {
+            answers: template.answers,
+            status: status
+        })
+        .then((res) => {
+            console.log(res);
+            setSaveStatus("saved");
+            setHasUnsavedChanges(false);
+        })
+        .catch((err) => {
+            console.error("Failed to update answers:", err);
+            setSaveStatus("unsaved");
+        });
+    }
+
+    // Auto-save timer that runs every 10 seconds
+    useEffect(() => {
+        const interval = setInterval(() => {
+            if (template.answers && template.answers.length > 0 && hasUnsavedChanges) {
+                updateAnswers();
+            }
+        }, 10000); // 10 seconds
+
+        // Cleanup interval on component unmount
+        return () => clearInterval(interval);
+    }, [template.answers, status, hasUnsavedChanges]); // Re-run when template.answers, status, or hasUnsavedChanges changes
+
+    const handleFormChange = () => {
+        setHasUnsavedChanges(true);
+        setSaveStatus("unsaved");
+    };
+
+    const getSaveStatusColor = () => {
+        switch (saveStatus) {
+            case "saved":
+                return "bg-green-500";
+            case "unsaved":
+                return "bg-yellow-500";
+            case "saving":
+                return "bg-blue-500";
+            default:
+                return "bg-gray-500";
+        }
+    };
+
+    const getSaveStatusText = () => {
+        switch (saveStatus) {
+            case "saved":
+                return "Saved";
+            case "unsaved":
+                return "Unsaved changes";
+            case "saving":
+                return "Saving...";
+            default:
+                return "Unknown";
+        }
+    };
+
     return (
-        <div className='flex flex-col w-full h-full items-center justify-center'>
-            <div className='flex flex-col w-[600px] min-h-[800px] items-center justify-center overflow-y-scroll'>
-                <p className='text-2xl font-bold'>{template.title}</p>
-                <p className='text-sm text-neutral-500 mb-4'>{template.description}</p>
-                <GenerateTemplate
-                    template={template}
-                    SetTemplate={(newTemplate) => {
-                        // Update the entire template object, not just the answers array
-                        setTemplate(newTemplate);
-                    }}
-                />
+        <div className='flex flex-col w-full h-full items-center justify-center p-4'>
+            {/* Main Form Window */}
+            <div className='relative w-full max-w-4xl'>
+                {/* Save Status Pill */}
+                <div className={`absolute top-4 right-4 z-10 px-3 py-1 rounded-full text-white text-sm font-medium shadow-lg ${getSaveStatusColor()}`}>
+                    {getSaveStatusText()}
+                </div>
+                
+                {/* Form Container */}
+                <div className='bg-white rounded-lg shadow-xl border border-gray-200 overflow-hidden'>
+                    {/* Header */}
+                    <div className='bg-gray-50 px-6 py-4 border-b border-gray-200'>
+                        <h1 className='text-2xl font-bold text-gray-900'>{template.title}</h1>
+                        <p className='text-sm text-gray-600 mt-1'>{template.description}</p>
+                    </div>
+                    
+                    {/* Scrollable Content Area */}
+                    <div className='h-[700px] overflow-y-auto px-6 py-6'>
+                        <GenerateTemplate
+                            template={template}
+                            SetTemplate={(newTemplate) => {
+                                setTemplate(newTemplate);
+                            }}
+                            onFormChange={handleFormChange}
+                        />
+                    </div>
+                </div>
             </div>
-            <button
-                className='px-4 py-2 bg-black cursor-pointer text-white rounded-md w-[180px] self-center flex items-center justify-center gap-2'
-                onClick={() => {
-                    console.log("Current template state:", template);
-                }}
-            >
-                Klar
-            </button>
+            
+            {/* Button Container */}
+            <div className='mt-6 flex justify-center'>
+                <button
+                    className='px-6 py-3 bg-black hover:bg-gray-800 transition-colors duration-200 cursor-pointer text-white rounded-lg font-medium text-base shadow-lg hover:shadow-xl transform hover:scale-105'
+                    onClick={() => {
+                        setStatus("Completed");
+                        updateAnswers();
+                    }}
+                >
+                    Klar
+                </button>
+            </div>
         </div>
     )
 }
