@@ -38,8 +38,8 @@ export default function ViewForm() {
                 <GenerateTemplate
                     template={template}
                     SetTemplate={(newTemplate) => {
-                        // Always update state to a new array to trigger re-render
-                        setTemplate([...newTemplate]);
+                        // Update the entire template object, not just the answers array
+                        setTemplate(newTemplate);
                     }}
                 />
             </div>

@@ -113,8 +113,13 @@ export function GenerateForm({ Form, SetForm, template, vars }) {
                                     type="number"
                                     value={question.value}
                                     onChange={(e) => {
-                                        Form["questions"][index]["value"] = e.target.value;
-                                        SetForm({ ...Form });
+                                        const updatedForm = {
+                                            ...Form,
+                                            questions: Form.questions.map((q, qIndex) =>
+                                                qIndex === index ? { ...q, value: e.target.value } : q
+                                            )
+                                        };
+                                        SetForm(updatedForm);
                                     }}
                                     className="bg-transparent border-0 border-b-2 border-gray-300 focus:border-blue-500 outline-none px-0 py-1 text-base"
                                     style={{ borderRadius: 0 }}
@@ -129,8 +134,13 @@ export function GenerateForm({ Form, SetForm, template, vars }) {
                                     type="text"
                                     value={question.value}
                                     onChange={(e) => {
-                                        Form["questions"][index]["value"] = e.target.value;
-                                        SetForm(Form);
+                                        const updatedForm = {
+                                            ...Form,
+                                            questions: Form.questions.map((q, qIndex) =>
+                                                qIndex === index ? { ...q, value: e.target.value } : q
+                                            )
+                                        };
+                                        SetForm(updatedForm);
                                     }}
                                     className="bg-transparent border-0 border-b-2 border-gray-300 focus:border-blue-500 outline-none px-0 py-1 text-base"
                                     style={{ borderRadius: 0 }}
@@ -144,8 +154,13 @@ export function GenerateForm({ Form, SetForm, template, vars }) {
                                 <select
                                     value={question.value}
                                     onChange={(e) => {
-                                        Form["questions"][index]["value"] = e.target.value;
-                                        SetForm(Form);
+                                        const updatedForm = {
+                                            ...Form,
+                                            questions: Form.questions.map((q, qIndex) =>
+                                                qIndex === index ? { ...q, value: e.target.value } : q
+                                            )
+                                        };
+                                        SetForm(updatedForm);
                                     }}
                                     className="bg-transparent border-0 border-b-2 border-gray-300 focus:border-blue-500 outline-none px-0 py-1 text-base"
                                     style={{ borderRadius: 0 }}
@@ -164,8 +179,13 @@ export function GenerateForm({ Form, SetForm, template, vars }) {
                                     type="checkbox"
                                     checked={question.value}
                                     onChange={(e) => {
-                                        Form["questions"][index]["value"] = e.target.checked;
-                                        SetForm(Form);
+                                        const updatedForm = {
+                                            ...Form,
+                                            questions: Form.questions.map((q, qIndex) =>
+                                                qIndex === index ? { ...q, value: e.target.checked } : q
+                                            )
+                                        };
+                                        SetForm(updatedForm);
                                     }}
                                 />
                             </div>
@@ -179,8 +199,13 @@ export function GenerateForm({ Form, SetForm, template, vars }) {
                                     type="date"
                                     value={question.value}
                                     onChange={(e) => {
-                                        Form["questions"][index]["value"] = e.target.value;
-                                        SetForm(Form);
+                                        const updatedForm = {
+                                            ...Form,
+                                            questions: Form.questions.map((q, qIndex) =>
+                                                qIndex === index ? { ...q, value: e.target.value } : q
+                                            )
+                                        };
+                                        SetForm(updatedForm);
                                     }}
                                 />
                             </div>
@@ -208,23 +233,39 @@ export function GenerateTemplate({ template, SetTemplate }) {
                             vars={template.vars}
                             SetForm={(updatedForm) => {
                                 // Always create a new array and new form object to ensure React state updates
-                                const updatedTemplate = safeTemplate.map((f, i) =>
-                                    i === index ? { ...updatedForm } : f
-                                );
+                                const updatedTemplate = {
+                                    ...template,
+                                    answers: safeTemplate.map((f, i) =>
+                                        i === index ? { ...updatedForm } : f
+                                    )
+                                };
                                 SetTemplate(updatedTemplate);
                             }}
                             template={safeTemplate}
                         />
                     )
                 }
+                return null; // Explicitly return null for non-active indices
             })}
             <div className='flex flex-col w-full h-full items-center justify-center'>
                 <div className='w-full h-2 bg-gray-200 rounded-full my-4'>
                     <div className='h-full bg-black rounded-full' style={{width: `${(pageIndex / safeTemplate.length) * 100}%`}}></div>
                 </div>
                 <div className='w-full flex flex-row items-center justify-between'>
-                    <button className='bg-black text-white px-4 py-2 rounded-md' onClick={() => {setPageIndex(pageIndex - 1)}}>Back</button>
-                    <button className='bg-black text-white px-4 py-2 rounded-md' onClick={() => {setPageIndex(pageIndex + 1)}}>Next</button>
+                    <button 
+                        className='bg-black text-white px-4 py-2 rounded-md' 
+                        onClick={() => {setPageIndex(pageIndex - 1)}}
+                        disabled={pageIndex === 0}
+                    >
+                        Back
+                    </button>
+                    <button 
+                        className='bg-black text-white px-4 py-2 rounded-md' 
+                        onClick={() => {setPageIndex(pageIndex + 1)}}
+                        disabled={pageIndex === safeTemplate.length - 1}
+                    >
+                        Next
+                    </button>
                 </div>
             </div>
         </div>
