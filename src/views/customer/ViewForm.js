@@ -16,8 +16,11 @@ export default function ViewForm() {
                     setTemplate({answers: res.data.answers, vars: {
                         "customer_full_name": res.data.customer.first_name + " " + res.data.customer.last_name,
                         "customer_personnummer": res.data.customer.personnummer,
-                        "customer_email": res.data.customer.email,
-                    }});
+                        "customer_email": res.data.customer.email
+                    },
+                    title: res.data.task.title,
+                    description: res.data.task.description
+                    });
                 } else {
                     console.error("No template found in response:", res.data);
                 }
@@ -28,22 +31,26 @@ export default function ViewForm() {
     }, []);
 
     return (
-        <div className='flex flex-col min-w-[600px] h-full items-center justify-center overflow-y-scroll'>
-            <GenerateTemplate
-                template={template}
-                SetTemplate={(newTemplate) => {
-                    // Always update state to a new array to trigger re-render
-                    setTemplate([...newTemplate]);
-                }}
-            />
-            <button
-                className='px-4 py-2 bg-black cursor-pointer text-white rounded-md w-[180px] self-center flex items-center justify-center gap-2'
-                onClick={() => {
-                    console.log("Current template state:", template);
-                }}
-            >
-                Klar
-            </button>
+        <div className='flex flex-col w-full h-full items-center justify-center'>
+            <div className='flex flex-col w-[600px] h-full items-center justify-center overflow-y-scroll'>
+                <p className='text-2xl font-bold'>{template.title}</p>
+                <p className='text-sm text-neutral-500 mb-4'>{template.description}</p>
+                <GenerateTemplate
+                    template={template}
+                    SetTemplate={(newTemplate) => {
+                        // Always update state to a new array to trigger re-render
+                        setTemplate([...newTemplate]);
+                    }}
+                />
+                <button
+                    className='px-4 py-2 bg-black cursor-pointer text-white rounded-md w-[180px] self-center flex items-center justify-center gap-2'
+                    onClick={() => {
+                        console.log("Current template state:", template);
+                    }}
+                >
+                    Klar
+                </button>
+            </div>
         </div>
     )
 }
