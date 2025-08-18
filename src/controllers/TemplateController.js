@@ -218,7 +218,7 @@ export function GenerateTemplate({ template, SetTemplate }) {
                     )
                 }
             })}
-            <div className='w-full h-2 bg-gray-200 rounded-full'>
+            <div className='w-full h-2 bg-gray-200 rounded-full my-4'>
                 <div className='h-full bg-black rounded-full' style={{width: `${(pageIndex / safeTemplate.length) * 100}%`}}></div>
             </div>
             <div className='w-full flex flex-row items-center justify-between'>
