@@ -195,24 +195,33 @@ export function GenerateForm({ Form, SetForm, template, vars }) {
 export function GenerateTemplate({ template, SetTemplate }) {
     // Defensive copy to avoid mutating the original template
     const safeTemplate = Array.isArray(template.answers) ? template.answers : [];
+    const [pageIndex, setPageIndex] = useState(0);
 
     return (
         <div className='flex flex-col w-full h-full'>
-            {safeTemplate.map((form, index) => (
-                <GenerateForm
-                    key={form.id || index}
-                    Form={form}
-                    vars={template.vars}
-                    SetForm={(updatedForm) => {
-                        // Always create a new array and new form object to ensure React state updates
-                        const updatedTemplate = safeTemplate.map((f, i) =>
-                            i === index ? { ...updatedForm } : f
-                        );
-                        SetTemplate(updatedTemplate);
-                    }}
-                    template={safeTemplate}
-                />
-            ))}
+            {safeTemplate.map((form, index) => {
+                if(index === pageIndex){
+                    return (
+                        <GenerateForm
+                            key={form.id || index}
+                            Form={form}
+                            vars={template.vars}
+                            SetForm={(updatedForm) => {
+                                // Always create a new array and new form object to ensure React state updates
+                                const updatedTemplate = safeTemplate.map((f, i) =>
+                                    i === index ? { ...updatedForm } : f
+                                );
+                                SetTemplate(updatedTemplate);
+                            }}
+                            template={safeTemplate}
+                        />
+                    )
+                }
+            })}
+            <div className='w-full flex flex-row items-center justify-between'>
+                <button className='bg-black text-white px-4 py-2 rounded-md' onClick={() => {setPageIndex(pageIndex - 1)}}>Back</button>
+                <button className='bg-black text-white px-4 py-2 rounded-md' onClick={() => {setPageIndex(pageIndex + 1)}}>Next</button>
+            </div>
         </div>
     );
 }
