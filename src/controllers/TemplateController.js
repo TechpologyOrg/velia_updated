@@ -219,6 +219,10 @@ export function GenerateTemplate({ template, SetTemplate }) {
                 }
             })}
             <div className='w-full flex flex-row items-center justify-between'>
+                {/* Progress bar based on index / length of safeTemplate */}
+                <div className='w-full h-2 bg-gray-200 rounded-full'>
+                    <div className='h-full bg-black rounded-full' style={{width: `${(pageIndex / safeTemplate.length) * 100}%`}}></div>
+                </div>
                 <button className='bg-black text-white px-4 py-2 rounded-md' onClick={() => {setPageIndex(pageIndex - 1)}}>Back</button>
                 <button className='bg-black text-white px-4 py-2 rounded-md' onClick={() => {setPageIndex(pageIndex + 1)}}>Next</button>
             </div>
