@@ -48,10 +48,19 @@ function TaskCard({ task, children }) {
                         )}
                     </div>
                 </div>
-                <div className="ml-4">
+                <div className="ml-4 flex flex-col gap-2">
                     <span className={`px-3 py-1 rounded-full text-xs font-medium ${pillClass}`}>
                         {statusLabel[task.status] || task.status}
                     </span>
+                    <p
+                        className={`text-sm ${
+                            task.due_date && new Date(task.due_date) < new Date()
+                                ? 'text-red-500'
+                                : 'text-neutral-500'
+                        }`}
+                    >
+                        Förfallodatum: {task.due_date}
+                    </p>
                 </div>
                 <div className="ml-4 flex items-center">
                     {open ? <FaChevronDown /> : <FaChevronRight />}
@@ -61,9 +70,9 @@ function TaskCard({ task, children }) {
                 <div className="w-full bg-neutral-50 border-l-4 border-black rounded-b-lg px-6 py-4 mt-1">
                     {/* Place for extra info or actions */}
                     {children ? children : (
-                        <div className="text-neutral-600 text-sm">
-                            {/* Placeholder: you can put anything here */}
-                            Mer information om ärendet kan visas här.
+                        <div className="text-neutral-600 text-sm flex flex-col gap-2">
+                            <div className='flex flex-row w-full items-center justify-between'>
+                            </div>
                         </div>
                     )}
                 </div>
