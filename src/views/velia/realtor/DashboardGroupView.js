@@ -1,8 +1,77 @@
 import React, { useState, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
-import { FaPlus } from 'react-icons/fa';
-import V_Popup from '../../../components/V_Popup';
 import api from '../../../lib/axiosClient';
+
+import V_Popup from '../../../components/V_Popup';
+
+import { FaPlus } from 'react-icons/fa';
+import { FaChevronDown, FaChevronRight } from 'react-icons/fa';
+
+function TaskCard({ task, children }) {
+    const [open, setOpen] = useState(false);
+
+    // Simple status color mapping
+    const statusColors = {
+        'pending': 'bg-yellow-200 text-yellow-800',
+        'in_progress': 'bg-blue-200 text-blue-800',
+        'completed': 'bg-green-200 text-green-800',
+        'overdue': 'bg-red-200 text-red-800',
+    };
+    const statusLabel = {
+        'pending': 'Ej påbörjad',
+        'in_progress': 'Pågår',
+        'completed': 'Klar',
+        'overdue': 'Försenad',
+    };
+
+    const pillClass = statusColors[task.status] || 'bg-neutral-200 text-neutral-700';
+
+    return (
+        <div className="w-full">
+            <div
+                className="flex items-center w-full px-4 py-3 bg-white rounded-lg shadow cursor-pointer transition hover:bg-neutral-50"
+                onClick={() => setOpen(o => !o)}
+            >
+                <div className="flex-1 min-w-0">
+                    <div className="font-semibold text-lg truncate">{task.title}</div>
+                    <div className="text-sm text-neutral-500 mt-1">
+                        {/* Example info: deadline and assigned to */}
+                        {task.deadline && (
+                            <span className="mr-4">
+                                Deadline: {new Date(task.deadline).toLocaleString('sv-SE')}
+                            </span>
+                        )}
+                        {task.assigned_to && (
+                            <span>
+                                Ansvarig: {task.assigned_to.first_name} {task.assigned_to.last_name}
+                            </span>
+                        )}
+                    </div>
+                </div>
+                <div className="ml-4">
+                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${pillClass}`}>
+                        {statusLabel[task.status] || task.status}
+                    </span>
+                </div>
+                <div className="ml-4 flex items-center">
+                    {open ? <FaChevronDown /> : <FaChevronRight />}
+                </div>
+            </div>
+            {open && (
+                <div className="w-full bg-neutral-50 border-l-4 border-black rounded-b-lg px-6 py-4 mt-1">
+                    {/* Place for extra info or actions */}
+                    {children ? children : (
+                        <div className="text-neutral-600 text-sm">
+                            {/* Placeholder: you can put anything here */}
+                            Mer information om ärendet kan visas här.
+                        </div>
+                    )}
+                </div>
+            )}
+        </div>
+    );
+}
+}
 
 export default function DashboardGroupView() {
     const { group } = useLocation().state;
@@ -67,6 +136,7 @@ export default function DashboardGroupView() {
 
     useEffect(() => {
         getTaskTemplates();
+        getTasks();
     }, []);
 
     const assignTask = (template) => {
@@ -185,6 +255,23 @@ export default function DashboardGroupView() {
         }
     }
 
+    const [tasks, setTasks] = useState([]);
+    const getTasks = () => {
+        api.get(`/tasks/`)
+        .then(resp => {
+            console.log(resp.data);
+            setTasks(resp.data.results);
+        })
+        .catch(err => {
+            console.error(err);
+        })
+    }
+    const renderTasks = () => {
+        return tasks.map((task) => {
+            return <TaskCard key={task.id} task={task} />
+        })
+    };
+
     return (
         <div className="flex flex-col w-full h-full">
             {renderPopup()}
@@ -208,13 +295,14 @@ export default function DashboardGroupView() {
                 </div>
             </div>
 
-            <div className="flex flex-col w-full mt-8 gap-4">
-            </div>
-
             <button className='px-4 py-2 bg-black cursor-pointer text-white rounded-md w-[180px] self-center flex items-center justify-center gap-2' onClick={() => setIsPopupOpen(true)}>
                 <FaPlus size={16} className="mr-1" />
                 Lägg till ärende
             </button>
+
+            <div className="flex flex-col w-full mt-8 gap-4">
+                {renderTasks()}
+            </div>
         </div>
     )
 }
