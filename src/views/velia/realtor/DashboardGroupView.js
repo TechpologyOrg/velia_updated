@@ -160,6 +160,7 @@ export default function DashboardGroupView() {
         })
         .finally(() => {
             setIsPopupOpen(false);
+            getTasks();
         })
     }
 
