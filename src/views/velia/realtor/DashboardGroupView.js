@@ -256,7 +256,7 @@ export default function DashboardGroupView() {
 
     const [tasks, setTasks] = useState([]);
     const getTasks = () => {
-        api.get(`/tasks/`)
+        api.get(`/tasks/group/${group.id}/`)
         .then(resp => {
             console.log(resp.data);
             setTasks(resp.data.results);
