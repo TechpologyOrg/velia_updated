@@ -71,7 +71,6 @@ function TaskCard({ task, children }) {
         </div>
     );
 }
-}
 
 export default function DashboardGroupView() {
     const { group } = useLocation().state;
