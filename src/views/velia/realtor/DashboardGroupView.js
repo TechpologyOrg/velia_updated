@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 import api from '../../../lib/axiosClient';
-
+import { CardTemplateRenderer } from '../../../controllers/CardTemplateController';
 import V_Popup from '../../../components/V_Popup';
 
 import { FaPlus } from 'react-icons/fa';
 import { FaChevronDown, FaChevronRight } from 'react-icons/fa';
 
-function TaskCard({ task, children }) {
+function TaskCard({ task, children, cardJson, setCardJson, globalVars }) {
     const [open, setOpen] = useState(false);
 
     // Simple status color mapping
@@ -72,6 +72,7 @@ function TaskCard({ task, children }) {
                     {children ? children : (
                         <div className="text-neutral-600 text-sm flex flex-col gap-2">
                             <div className='flex flex-row w-full items-center justify-between'>
+                                <CardTemplateRenderer jsonTemplate={cardJson} globalVars={globalVars} onChange={setCardJson} />
                             </div>
                         </div>
                     )}
@@ -277,9 +278,43 @@ export default function DashboardGroupView() {
     }
     const renderTasks = () => {
         return tasks.map((task) => {
-            return <TaskCard key={task.id} task={task} />
+            return <TaskCard key={task.id} task={task} cardJson={cardJson} setCardJson={setCardJson} globalVars={globalVars} />
         })
     };
+
+    const [globalVars, setGlobalVars] = useState({
+        "group": group,
+        "customers": group.customers,
+        "realtor": group.realtor,
+        "coordinator": group.coordinator,
+    });
+
+    const [cardJson, setCardJson] = useState([
+        {
+            "tag": "div", "class": "flex flex-row justify-between items-center w-full h-full p-2", "children": [
+                {
+                    "tag": "div", "class": "flex flex-col gap-2", "children": [
+                        { "tag": "Itext", "type": "Editable", "title": "Namn", "value": "", "var": "namn" },
+                        { "tag": "Itext", "type": "Editable", "title": "Personnummer", "value": "", "var": "personnummer" },
+                        { "tag": "Itext", "type": "Editable", "title": "Födelsedag", "value": "", "var": "födelsedag" },
+                        { "tag": "Itext", "type": "Editable", "title": "Adress", "value": "", "var": "adress" },
+                        { "tag": "Itext", "type": "Editable", "title": "Email", "value": "", "var": "email" },
+                        { "tag": "Itext", "type": "Editable", "title": "Telefon", "value": "", "var": "telefon" },
+                        { "tag": "Itext", "type": "Editable", "title": "Ägarandel", "value": "", "var": "ägarandel" },
+
+                        {
+                            "tag": "div", "class": "flex flex-col gap-2", "children": [
+                                { "tag": "IBool", "type": "display", "title": "ID-Kontroll", "value": "", "var": "id_kontroll" },
+                                { "tag": "IBool", "type": "display", "title": "Formulär", "value": "", "var": "formulär" }
+                            ]
+                        },
+                        { "tag": "p", "type": "display", "value": "Screening" },
+                        { "tag": "p", "type": "display", "var": "ScreeningResults", "value": "" }
+                    ]
+                }
+            ]
+        }
+    ]);
 
     return (
         <div className="flex flex-col w-full h-full">
