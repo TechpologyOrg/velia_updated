@@ -209,7 +209,7 @@ export function CardTemplateRenderer({ jsonTemplate, globalVars, onChange }) {
     }
 
     return (
-        <div>
+        <div className='w-full h-full'>
             {renderNode(templateState)}
         </div>
     );
