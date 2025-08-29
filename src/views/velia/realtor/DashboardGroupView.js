@@ -278,7 +278,23 @@ export default function DashboardGroupView() {
     }
     const renderTasks = () => {
         return tasks.map((task) => {
-            return <TaskCard key={task.id} task={task} cardJson={cardJson} setCardJson={setCardJson} globalVars={globalVars} />
+            return (
+                <TaskCard
+                    key={task.id}
+                    task={task}
+                    cardJson={task.realtor_card}
+                    setCardJson={updatedCardJson => {
+                        setTasks(prevTasks =>
+                            prevTasks.map(t =>
+                                t.id === task.id
+                                    ? { ...t, realtor_card: updatedCardJson }
+                                    : t
+                            )
+                        );
+                    }}
+                    globalVars={globalVars}
+                />
+            );
         })
     };
 
