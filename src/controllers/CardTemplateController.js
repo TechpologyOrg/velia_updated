@@ -173,6 +173,7 @@ export function CardTemplateRenderer({ jsonTemplate, globalVars, onChange }) {
         return (
             <Tag key={path.join('-')} className={className || ''}>
                 {title && <div className="mb-1 text-sm font-medium text-gray-700">{title}</div>}
+                {value && value}
                 {children && renderNode(children, [...path, 'children'])}
             </Tag>
         );
