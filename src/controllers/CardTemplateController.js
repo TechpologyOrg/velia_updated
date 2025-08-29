@@ -165,6 +165,35 @@ export function CardTemplateRenderer({ jsonTemplate, globalVars, onChange }) {
                     );
                 }
             }
+            // Ibutton
+            if (tag === 'Ibutton') {
+                if (type && type.toLowerCase() === 'display') {
+                    return (
+                        <div key={path.join('-')} className={className || ''}>
+                            {title && <label className="mb-1 text-sm font-medium text-gray-700">{title}</label>}
+                            <button
+                                className="px-4 py-2 bg-gray-100 border border-gray-300 rounded text-gray-500 cursor-not-allowed"
+                                disabled
+                            >
+                                {title || 'Button'}
+                            </button>
+                        </div>
+                    );
+                } else {
+                    // Editable or standard
+                    return (
+                        <div key={path.join('-')} className={className || ''}>
+                            {title && <label className="mb-1 text-sm font-medium text-gray-700">{title}</label>}
+                            <button
+                                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors"
+                                onClick={() => window.open(value || '#', '_blank')}
+                            >
+                                {title || 'Button'}
+                            </button>
+                        </div>
+                    );
+                }
+            }
             // Add more interactable tags as needed
         }
 
