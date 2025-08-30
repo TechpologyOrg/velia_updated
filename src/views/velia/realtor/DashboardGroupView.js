@@ -353,6 +353,7 @@ export default function DashboardGroupView() {
             <div className='flex flex-row items-end gap-2'>
                 <p className="text-4xl font-semibold">{group.address}</p>
                 <p className='text-neutral-800 text-xl'>{group.postnummer}, {group.ort}</p>
+                <p className='text-blue-400 text-sm'>{`https://www.velia.se/${group.organisation.name}/customer/login`}</p>
             </div>
             <p className="text-neutral-500 text-lg">Visa och hantera grupp</p>
 
@@ -370,7 +371,7 @@ export default function DashboardGroupView() {
                 </div>
             </div>
 
-            <button className='px-4 py-2 bg-black cursor-pointer text-white rounded-md w-[180px] self-center flex items-center justify-center gap-2' onClick={() => setIsPopupOpen(true)}>
+            <button className='px-4 py-2 mt-4 bg-black cursor-pointer text-white rounded-md w-[180px] self-center flex items-center justify-center gap-2' onClick={() => setIsPopupOpen(true)}>
                 <FaPlus size={16} className="mr-1" />
                 Lägg till ärende
             </button>

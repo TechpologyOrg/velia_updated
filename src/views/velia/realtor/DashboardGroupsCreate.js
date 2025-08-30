@@ -186,15 +186,45 @@ export default function DashboardGroupsCreate() {
     }
 
     const createGroup = () => {
-        console.log(sessionStorage.getItem("user")["id"])
+        console.log("createGroup function called!");
+        console.log("User from sessionStorage:", sessionStorage.getItem("user"))
+        console.log("Current state values:", { address, postnummer, ort, selectedCoordinator, customers });
+
+        // Validate required fields
+        if (!address || !postnummer || !ort) {
+            console.error("Missing required fields: address, postnummer, or ort");
+            alert("Please fill in all required fields (address, postnummer, ort)");
+            return;
+        }
+
+        if (!selectedCoordinator) {
+            console.error("No coordinator selected");
+            alert("Please select a coordinator");
+            return;
+        }
 
         // Debug: Check if customers are being received from AddCustomerWindow
         console.log("Customers received in createGroup:", customers);
 
         if (!customers || customers.length === 0) {
-            console.warn("No customers to create. Did AddCustomerWindow pass up customers correctly?");
+            console.warn("No customers to create. Creating group without customers.");
+            // Create group directly without customers
+            return api.post("/groups/", {
+                address: address,
+                postnummer: postnummer,
+                ort: ort,
+                coordinator: selectedCoordinator.id,
+                realtor: JSON.parse(sessionStorage.getItem("user")).user?.id || JSON.parse(sessionStorage.getItem("user")).id,
+                customers: []
+            }).then(resp => {
+                console.log("Group created successfully:", resp.data);
+                navigate("/dashboard/groups")
+            }).catch(err => {
+                console.error("Error creating group:", err.message);
+            });
         }
 
+        // If there are customers, create them first, then create the group
         Promise.all(
             customers.map(customer => {
                 const [first_name, ...rest] = customer.fullName.split(" ");
@@ -227,7 +257,7 @@ export default function DashboardGroupsCreate() {
                 postnummer: postnummer,
                 ort: ort,
                 coordinator: selectedCoordinator.id,
-                realtor: JSON.parse(sessionStorage.getItem("user")).user.id,
+                realtor: JSON.parse(sessionStorage.getItem("user")).user?.id || JSON.parse(sessionStorage.getItem("user")).id,
                 customers: customerIds
             });
         }).then(resp => {
@@ -273,7 +303,7 @@ export default function DashboardGroupsCreate() {
             </div>
 
             <div className='flex flex-row gap-2 w-full justify-center mt-[40px]'>
-                <button className="px-4 py-2 bg-black cursor-pointer text-white rounded-md w-[180px]" onClick={()=>{createGroup();}}>Skapa grupp</button>
+                <button className="px-4 py-2 bg-black cursor-pointer text-white rounded-md w-[180px]" onClick={createGroup}>Skapa grupp</button>
             </div>
 
         </div>
