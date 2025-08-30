@@ -303,7 +303,7 @@ export default function DashboardGroupView() {
                         // If the task has a property "extraVars", spread its keys into globalVars
                         ...(task.title.includes("KYC") ? {
                             // "Screening": task.title.includes("Screening") ? "Ja" : "Nej",
-                            // "ScreeningResults": task.title.includes("Screening") ? "Ja" : "Nej",
+                            "ScreeningResults": "No Screening Results",
                             "ID-Kontroll": (task.customer_response.created_at !== task.customer_response.updated_at) ? "Ja" : "Nej",
                             "formURL": `https://www.velia.se/${task.customer.organisation.name}/customer/dashboard/task/${task.customer_response.id}`
                         } : {}),
