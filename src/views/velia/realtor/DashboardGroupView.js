@@ -305,7 +305,7 @@ export default function DashboardGroupView() {
                             // "Screening": task.title.includes("Screening") ? "Ja" : "Nej",
                             // "ScreeningResults": task.title.includes("Screening") ? "Ja" : "Nej",
                             // "ID-Kontroll": task.title.includes("ID-Kontroll") ? "Ja" : "Nej",
-                            "formURL": `https://www.velia.se/${task.organisation.name}/customer/dashboard/task/${task.id}`
+                            "formURL": `https://www.velia.se/${task.customer.organisation.name}/customer/dashboard/task/${task.id}`
                         } : {}),
                     }}
                 />
