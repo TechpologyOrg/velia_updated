@@ -303,6 +303,7 @@ export default function DashboardGroupView() {
                         // If the task has a property "extraVars", spread its keys into globalVars
                         ...(task.title.includes("KYC") ? {
                             // "Screening": task.title.includes("Screening") ? "Ja" : "Nej",
+                            "Adress": task.customer_response.answers[0].questions[2].value,
                             "ScreeningResults": "No Screening Results",
                             "ID-Kontroll": (task.customer_response.created_at !== task.customer_response.updated_at) ? "Ja" : "Nej",
                             "formURL": `https://www.velia.se/${task.customer.organisation.name}/customer/dashboard/task/${task.customer_response.id}`
@@ -353,9 +354,9 @@ export default function DashboardGroupView() {
             <div className='flex flex-row items-end gap-2'>
                 <p className="text-4xl font-semibold">{group.address}</p>
                 <p className='text-neutral-800 text-xl'>{group.postnummer}, {group.ort}</p>
-                <p className='text-blue-400 text-sm'>{`https://www.velia.se/${group.organisation.name}/customer/login`}</p>
             </div>
             <p className="text-neutral-500 text-lg">Visa och hantera grupp</p>
+            <p className='text-blue-400 text-sm cursor-pointer' >{`https://www.velia.se/${group.organisation.name}/customer/login`}</p>
 
             <div className='flex flex-row w-full flex-wrap md:flex-nowrap items-center justify-between mt-8'>
                 <div className='flex flex-col w-full md:w-[200px] py-4'>
