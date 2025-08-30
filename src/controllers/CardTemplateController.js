@@ -194,6 +194,37 @@ export function CardTemplateRenderer({ jsonTemplate, globalVars, onChange }) {
                     );
                 }
             }
+            // Imultiline
+            if (tag === 'Imultiline') {
+                if (type && type.toLowerCase() === 'display') {
+                    return (
+                        <div key={path.join('-')} className={className || ''}>
+                            {title && <label className="mb-1 text-sm font-medium text-gray-700">{title}</label>}
+                            <textarea
+                                value={value || ''}
+                                readOnly
+                                rows={4}
+                                className="w-full bg-gray-100 border border-gray-300 rounded px-2 py-1 resize-none"
+                                placeholder={title ? title.toLowerCase() : ''}
+                            />
+                        </div>
+                    );
+                } else {
+                    // Editable or standard
+                    return (
+                        <div key={path.join('-')} className={className || ''}>
+                            {title && <label className="mb-1 text-sm font-medium text-gray-700">{title}</label>}
+                            <textarea
+                                value={value || ''}
+                                onChange={e => updateValueAtPath(path, e.target.value)}
+                                rows={4}
+                                className="w-full border border-gray-300 rounded px-2 py-1 resize-none"
+                                placeholder={title ? title.toLowerCase() : ''}
+                            />
+                        </div>
+                    );
+                }
+            }
             // Add more interactable tags as needed
         }
 

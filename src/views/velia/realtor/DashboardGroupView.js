@@ -304,7 +304,7 @@ export default function DashboardGroupView() {
                         ...(task.title.includes("KYC") ? {
                             // "Screening": task.title.includes("Screening") ? "Ja" : "Nej",
                             // "ScreeningResults": task.title.includes("Screening") ? "Ja" : "Nej",
-                            // "ID-Kontroll": task.title.includes("ID-Kontroll") ? "Ja" : "Nej",
+                            "ID-Kontroll": (task.customer_response.created_at !== task.customer_response.updated_at) ? "Ja" : "Nej",
                             "formURL": `https://www.velia.se/${task.customer.organisation.name}/customer/dashboard/task/${task.customer_response.id}`
                         } : {}),
                     }}
