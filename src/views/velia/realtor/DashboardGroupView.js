@@ -292,7 +292,22 @@ export default function DashboardGroupView() {
                             )
                         );
                     }}
-                    globalVars={globalVars}
+                    // Make a copy of globalVars and add more keys if needed
+                    globalVars={{
+                        ...globalVars,
+                        "Namn": `${task.customer.first_name} ${task.customer.last_name}`,
+                        "Personnummer": task.customer.personnummer,
+                        "Födelsedag": task.customer.personnummer.slice(0, 4) + "-" + task.customer.personnummer.slice(4, 6) + "-" + task.customer.personnummer.slice(6, 8),
+                        "Email": task.customer.email,
+                        "Ägarandel": task.customer.ägarandel,
+                        // If the task has a property "extraVars", spread its keys into globalVars
+                        ...(task.title.includes("KYC") ? {
+                            // "Screening": task.title.includes("Screening") ? "Ja" : "Nej",
+                            // "ScreeningResults": task.title.includes("Screening") ? "Ja" : "Nej",
+                            // "ID-Kontroll": task.title.includes("ID-Kontroll") ? "Ja" : "Nej",
+                            "formURL": `https://www.velia.se/${task.organisation.name}/customer/dashboard/task/${task.id}`
+                        } : {}),
+                    }}
                 />
             );
         })
