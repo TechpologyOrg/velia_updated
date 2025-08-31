@@ -253,13 +253,18 @@ export function CardTemplateRenderer({ jsonTemplate, globalVars, onChange }) {
                 } else {
                     // Editable or standard
                     return (
-                        <div key={path.join('-')} className={className || ''}>
+                        <div key={path.join('-')} className={className || ''} style={{ position: 'relative', overflow: 'visible' }}>
                             {title && <label className="mb-1 text-sm font-medium text-gray-700">{title}</label>}
                             <select
                                 value={value || ''}
                                 onChange={e => updateValueAtPath(path, e.target.value)}
-                                className="w-full border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white relative z-10"
-                                style={{ position: 'relative', zIndex: 10 }}
+                                className="w-full border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                                style={{ 
+                                    position: 'relative', 
+                                    zIndex: 9999,
+                                    overflow: 'visible',
+                                    transform: 'translateZ(0)'
+                                }}
                             >
                                 <option value="">{title ? `Select ${title.toLowerCase()}` : 'Select an option'}</option>
                                 {choices.map((choice, index) => (
