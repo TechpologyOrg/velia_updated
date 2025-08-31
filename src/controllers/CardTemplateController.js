@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 
 /**
  * Recursively resolves "var" keys in the json array using globalVars.
@@ -50,6 +50,10 @@ export function CardTemplateRenderer({ jsonTemplate, globalVars, onChange }) {
     const [templateState, setTemplateState] = useState(() =>
         resolveVars(jsonTemplate, globalVars)
     );
+    
+    // Store the latest onChange function in a ref to avoid infinite re-renders
+    const onChangeRef = useRef(onChange);
+    onChangeRef.current = onChange;
 
     // If jsonTemplate or globalVars change, re-resolve and reset state
     useEffect(() => {
@@ -58,10 +62,10 @@ export function CardTemplateRenderer({ jsonTemplate, globalVars, onChange }) {
 
     // Notify parent of changes
     useEffect(() => {
-        if (onChange) {
-            onChange(templateState);
+        if (onChangeRef.current) {
+            onChangeRef.current(templateState);
         }
-    }, [templateState, onChange]);
+    }, [templateState]);
 
     // Helper to update a value at a given path in the templateState
     const updateValueAtPath = useCallback((path, newValue) => {
@@ -228,7 +232,6 @@ export function CardTemplateRenderer({ jsonTemplate, globalVars, onChange }) {
             // IChoice
             if (tag === 'IChoice') {
                 const choices = node.choices || [];
-                console.log('IChoice render:', { choices, value, title }); // Debug log
                 if (type && type.toLowerCase() === 'display') {
                     return (
                         <div key={path.join('-')} className={className || ''}>
