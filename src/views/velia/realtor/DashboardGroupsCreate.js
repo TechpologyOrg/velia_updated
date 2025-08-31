@@ -234,6 +234,7 @@ export default function DashboardGroupsCreate() {
                     first_name: first_name,
                     last_name: last_name,
                     personnummer: customer.personnummer,
+                    organisation: sessionStorage.getItem("user")?.organisation?.id,
                 };
                 console.log("Sending POST /users/customers/ with payload:", payload);
                 return api.post("/users/customers/", payload)
