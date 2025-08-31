@@ -225,6 +225,48 @@ export function CardTemplateRenderer({ jsonTemplate, globalVars, onChange }) {
                     );
                 }
             }
+            // IChoice
+            if (tag === 'IChoice') {
+                const choices = node.choices || [];
+                if (type && type.toLowerCase() === 'display') {
+                    return (
+                        <div key={path.join('-')} className={className || ''}>
+                            {title && <label className="mb-1 text-sm font-medium text-gray-700">{title}</label>}
+                            <select
+                                value={value || ''}
+                                disabled
+                                className="w-full bg-gray-100 border border-gray-300 rounded px-2 py-1 text-gray-500"
+                            >
+                                <option value="">{title ? `Select ${title.toLowerCase()}` : 'Select an option'}</option>
+                                {choices.map((choice, index) => (
+                                    <option key={index} value={choice}>
+                                        {choice}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                    );
+                } else {
+                    // Editable or standard
+                    return (
+                        <div key={path.join('-')} className={className || ''}>
+                            {title && <label className="mb-1 text-sm font-medium text-gray-700">{title}</label>}
+                            <select
+                                value={value || ''}
+                                onChange={e => updateValueAtPath(path, e.target.value)}
+                                className="w-full border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            >
+                                <option value="">{title ? `Select ${title.toLowerCase()}` : 'Select an option'}</option>
+                                {choices.map((choice, index) => (
+                                    <option key={index} value={choice}>
+                                        {choice}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                    );
+                }
+            }
             // Add more interactable tags as needed
         }
 
