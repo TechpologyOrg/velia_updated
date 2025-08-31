@@ -228,6 +228,7 @@ export function CardTemplateRenderer({ jsonTemplate, globalVars, onChange }) {
             // IChoice
             if (tag === 'IChoice') {
                 const choices = node.choices || [];
+                console.log('IChoice render:', { choices, value, title }); // Debug log
                 if (type && type.toLowerCase() === 'display') {
                     return (
                         <div key={path.join('-')} className={className || ''}>
@@ -254,7 +255,8 @@ export function CardTemplateRenderer({ jsonTemplate, globalVars, onChange }) {
                             <select
                                 value={value || ''}
                                 onChange={e => updateValueAtPath(path, e.target.value)}
-                                className="w-full border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                className="w-full border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white relative z-10"
+                                style={{ position: 'relative', zIndex: 10 }}
                             >
                                 <option value="">{title ? `Select ${title.toLowerCase()}` : 'Select an option'}</option>
                                 {choices.map((choice, index) => (
