@@ -232,47 +232,60 @@ export function CardTemplateRenderer({ jsonTemplate, globalVars, onChange }) {
             // IChoice
             if (tag === 'IChoice') {
                 const choices = node.choices || [];
+                const [isOpen, setIsOpen] = useState(false);
+                
                 if (type && type.toLowerCase() === 'display') {
                     return (
                         <div key={path.join('-')} className={className || ''}>
                             {title && <label className="mb-1 text-sm font-medium text-gray-700">{title}</label>}
-                            <select
-                                value={value || ''}
-                                disabled
-                                className="w-full bg-gray-100 border border-gray-300 rounded px-2 py-1 text-gray-500"
-                            >
-                                <option value="">{title ? `Select ${title.toLowerCase()}` : 'Select an option'}</option>
-                                {choices.map((choice, index) => (
-                                    <option key={index} value={choice}>
-                                        {choice}
-                                    </option>
-                                ))}
-                            </select>
+                            <div className="w-full bg-gray-100 border border-gray-300 rounded px-2 py-1 text-gray-500">
+                                {value || (title ? `Select ${title.toLowerCase()}` : 'Select an option')}
+                            </div>
                         </div>
                     );
                 } else {
-                    // Editable or standard
+                    // Editable or standard - Custom dropdown
                     return (
-                        <div key={path.join('-')} className={className || ''} style={{ position: 'relative', overflow: 'visible' }}>
+                        <div key={path.join('-')} className={className || ''} style={{ position: 'relative' }}>
                             {title && <label className="mb-1 text-sm font-medium text-gray-700">{title}</label>}
-                            <select
-                                value={value || ''}
-                                onChange={e => updateValueAtPath(path, e.target.value)}
-                                className="w-full border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
-                                style={{ 
-                                    position: 'relative', 
-                                    zIndex: 9999,
-                                    overflow: 'visible',
-                                    transform: 'translateZ(0)'
-                                }}
-                            >
-                                <option value="">{title ? `Select ${title.toLowerCase()}` : 'Select an option'}</option>
-                                {choices.map((choice, index) => (
-                                    <option key={index} value={choice}>
-                                        {choice}
-                                    </option>
-                                ))}
-                            </select>
+                            <div className="relative">
+                                <button
+                                    type="button"
+                                    onClick={() => setIsOpen(!isOpen)}
+                                    className="w-full border border-gray-300 rounded px-2 py-1 text-left bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 flex justify-between items-center"
+                                >
+                                    <span>{value || (title ? `Select ${title.toLowerCase()}` : 'Select an option')}</span>
+                                    <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </button>
+                                
+                                {isOpen && (
+                                    <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto">
+                                        <div
+                                            className="px-2 py-1 text-sm text-gray-500 cursor-pointer hover:bg-gray-100"
+                                            onClick={() => {
+                                                updateValueAtPath(path, '');
+                                                setIsOpen(false);
+                                            }}
+                                        >
+                                            {title ? `Select ${title.toLowerCase()}` : 'Select an option'}
+                                        </div>
+                                        {choices.map((choice, index) => (
+                                            <div
+                                                key={index}
+                                                className="px-2 py-1 text-sm cursor-pointer hover:bg-gray-100"
+                                                onClick={() => {
+                                                    updateValueAtPath(path, choice);
+                                                    setIsOpen(false);
+                                                }}
+                                            >
+                                                {choice}
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     );
                 }
