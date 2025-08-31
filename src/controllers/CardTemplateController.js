@@ -51,6 +51,9 @@ export function CardTemplateRenderer({ jsonTemplate, globalVars, onChange }) {
         resolveVars(jsonTemplate, globalVars)
     );
     
+    // Store dropdown open states
+    const [openDropdowns, setOpenDropdowns] = useState(new Set());
+    
     // Store the latest onChange function in a ref to avoid infinite re-renders
     const onChangeRef = useRef(onChange);
     onChangeRef.current = onChange;
@@ -94,6 +97,29 @@ export function CardTemplateRenderer({ jsonTemplate, globalVars, onChange }) {
                 );
             }
             return prev;
+        });
+    }, []);
+
+    // Helper to toggle dropdown state
+    const toggleDropdown = useCallback((path) => {
+        setOpenDropdowns(prev => {
+            const newSet = new Set(prev);
+            const pathKey = path.join('-');
+            if (newSet.has(pathKey)) {
+                newSet.delete(pathKey);
+            } else {
+                newSet.add(pathKey);
+            }
+            return newSet;
+        });
+    }, []);
+
+    // Helper to close dropdown
+    const closeDropdown = useCallback((path) => {
+        setOpenDropdowns(prev => {
+            const newSet = new Set(prev);
+            newSet.delete(path.join('-'));
+            return newSet;
         });
     }, []);
 
@@ -232,7 +258,8 @@ export function CardTemplateRenderer({ jsonTemplate, globalVars, onChange }) {
             // IChoice
             if (tag === 'IChoice') {
                 const choices = node.choices || [];
-                const [isOpen, setIsOpen] = useState(false);
+                const pathKey = path.join('-');
+                const isOpen = openDropdowns.has(pathKey);
                 
                 if (type && type.toLowerCase() === 'display') {
                     return (
@@ -251,7 +278,7 @@ export function CardTemplateRenderer({ jsonTemplate, globalVars, onChange }) {
                             <div className="relative">
                                 <button
                                     type="button"
-                                    onClick={() => setIsOpen(!isOpen)}
+                                    onClick={() => toggleDropdown(path)}
                                     className="w-full border border-gray-300 rounded px-2 py-1 text-left bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 flex justify-between items-center"
                                 >
                                     <span>{value || (title ? `Select ${title.toLowerCase()}` : 'Select an option')}</span>
@@ -266,7 +293,7 @@ export function CardTemplateRenderer({ jsonTemplate, globalVars, onChange }) {
                                             className="px-2 py-1 text-sm text-gray-500 cursor-pointer hover:bg-gray-100"
                                             onClick={() => {
                                                 updateValueAtPath(path, '');
-                                                setIsOpen(false);
+                                                closeDropdown(path);
                                             }}
                                         >
                                             {title ? `Select ${title.toLowerCase()}` : 'Select an option'}
@@ -277,7 +304,7 @@ export function CardTemplateRenderer({ jsonTemplate, globalVars, onChange }) {
                                                 className="px-2 py-1 text-sm cursor-pointer hover:bg-gray-100"
                                                 onClick={() => {
                                                     updateValueAtPath(path, choice);
-                                                    setIsOpen(false);
+                                                    closeDropdown(path);
                                                 }}
                                             >
                                                 {choice}
