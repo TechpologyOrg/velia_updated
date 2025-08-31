@@ -295,17 +295,17 @@ export default function DashboardGroupView() {
                     // Make a copy of globalVars and add more keys if needed
                     globalVars={{
                         ...globalVars,
-                        "Namn": `${task.customer?.first_name} ${task.customer?.last_name}`,
-                        "Personnummer": task.customer?.personnummer,
-                        "Födelsedag": task.customer?.personnummer.slice(0, 4) + "-" + task.customer?.personnummer.slice(4, 6) + "-" + task.customer?.personnummer.slice(6, 8),
-                        "Email": task.customer?.email,
-                        "Ägarandel": task.customer?.ägarandel,
+                        "namn": `${task.customer?.first_name} ${task.customer?.last_name}`,
+                        "personnummer": task.customer?.personnummer,
+                        "födelsedag": task.customer?.personnummer.slice(0, 4) + "-" + task.customer?.personnummer.slice(4, 6) + "-" + task.customer?.personnummer.slice(6, 8),
+                        "email": task.customer?.email,
+                        "ägarandel": task.customer?.ägarandel,
                         // If the task has a property "extraVars", spread its keys into globalVars
                         ...(task.title.includes("KYC") ? {
                             // "Screening": task.title.includes("Screening") ? "Ja" : "Nej",
-                            "Adress": task.customer_response?.answers[0]?.questions[2]?.value,
-                            "ScreeningResults": "No Screening Results",
-                            "ID-Kontroll": (task.customer_response?.created_at !== task.customer_response?.updated_at) ? "Ja" : "Nej",
+                            "adress": task.customer_response?.answers[0]?.questions[2]?.value,
+                            "screening_results": "No Screening Results",
+                            "id_kontroll": (task.customer_response?.created_at !== task.customer_response?.updated_at) ? "Ja" : "Nej",
                             "formURL": `https://www.velia.se/${task.customer?.organisation?.name}/customer/dashboard/task/${task.customer_response?.id}`
                         } : {}),
                     }}
