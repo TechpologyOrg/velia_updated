@@ -278,11 +278,28 @@ export default function DashboardGroupView() {
     }
     const renderTasks = () => {
         return tasks.map((task) => {
+            const taskGlobalVars = {
+                ...globalVars,
+                "namn": `${task.customer?.first_name} ${task.customer?.last_name}`,
+                "personnummer": task.customer?.personnummer,
+                "födelsedag": task.customer?.personnummer.slice(0, 4) + "-" + task.customer?.personnummer.slice(4, 6) + "-" + task.customer?.personnummer.slice(6, 8),
+                "email": task.customer?.email,
+                "ägarandel": task.customer?.ägarandel,
+                // If the task has a property "extraVars", spread its keys into globalVars
+                ...(task.title.includes("KYC") ? {
+                    // "Screening": task.title.includes("Screening") ? "Ja" : "Nej",
+                    "adress": task.customer_response?.answers[0]?.questions[2]?.value,
+                    "screening_results": "No Screening Results",
+                    "id_kontroll": (task.customer.verified) ? "Ja" : "Nej",
+                    "formURL": `https://www.velia.se/${task.customer?.organisation?.name}/customer/dashboard/task/${task.customer_response?.id}`
+                } : {}),
+            };
+            console.log("Rendering TaskCard with globalVars:", taskGlobalVars);
             return (
                 <TaskCard
                     key={task.id}
                     task={task}
-                    cardJson={task.realtor_card}
+                    cardJson={task.realtor_card || cardJson}
                     onSave={(e) => handleSaveCardJson(e, task.id)}
                     setCardJson={updatedCardJson => {
                         setTasks(prevTasks =>
@@ -294,22 +311,7 @@ export default function DashboardGroupView() {
                         );
                     }}
                     // Make a copy of globalVars and add more keys if needed
-                    globalVars={{
-                        ...globalVars,
-                        "namn": `${task.customer?.first_name} ${task.customer?.last_name}`,
-                        "personnummer": task.customer?.personnummer,
-                        "födelsedag": task.customer?.personnummer.slice(0, 4) + "-" + task.customer?.personnummer.slice(4, 6) + "-" + task.customer?.personnummer.slice(6, 8),
-                        "email": task.customer?.email,
-                        "ägarandel": task.customer?.ägarandel,
-                        // If the task has a property "extraVars", spread its keys into globalVars
-                        ...(task.title.includes("KYC") ? {
-                            // "Screening": task.title.includes("Screening") ? "Ja" : "Nej",
-                            "adress": task.customer_response?.answers[0]?.questions[2]?.value,
-                            "screening_results": "No Screening Results",
-                            "id_kontroll": (task.customer.verified) ? "Ja" : "Nej",
-                            "formURL": `https://www.velia.se/${task.customer?.organisation?.name}/customer/dashboard/task/${task.customer_response?.id}`
-                        } : {}),
-                    }}
+                    globalVars={taskGlobalVars}
                 />
             );
         })

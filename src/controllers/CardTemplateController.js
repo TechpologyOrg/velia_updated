@@ -5,17 +5,28 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
  * Mutates a copy of the input json.
  */
 function resolveVars(json, globalVars) {
+    console.log('resolveVars called with:', { json, globalVars });
+    
+    if (!json || !Array.isArray(json)) {
+        return [];
+    }
+    
     function getVarValue(varKey) {
         if (globalVars && varKey in globalVars) {
-            return globalVars[varKey];
+            const value = globalVars[varKey];
+            console.log(`Resolved var "${varKey}" to:`, value);
+            return value;
         }
         if (globalVars && globalVars.misc && Array.isArray(globalVars.misc)) {
             for (const miscObj of globalVars.misc) {
                 if (varKey in miscObj) {
-                    return miscObj[varKey];
+                    const value = miscObj[varKey];
+                    console.log(`Resolved var "${varKey}" from misc to:`, value);
+                    return value;
                 }
             }
         }
+        console.log(`Could not resolve var "${varKey}", returning empty string`);
         return '';
     }
 
@@ -36,7 +47,9 @@ function resolveVars(json, globalVars) {
         return obj;
     }
 
-    return traverse(json);
+    const result = traverse(json);
+    console.log('resolveVars result:', result);
+    return result;
 }
 
 /**
@@ -46,10 +59,14 @@ function resolveVars(json, globalVars) {
  * @param {Function} props.onChange - Callback to parent with updated JSON.
  */
 export function CardTemplateRenderer({ jsonTemplate, globalVars, onChange, onSave }) {
+    console.log('CardTemplateRenderer props:', { jsonTemplate, globalVars });
+    
     // We keep a local state for the working JSON, so we can update values as user interacts
-    const [templateState, setTemplateState] = useState(() =>
-        resolveVars(jsonTemplate, globalVars)
-    );
+    const [templateState, setTemplateState] = useState(() => {
+        const resolved = resolveVars(jsonTemplate || [], globalVars);
+        console.log('Initial templateState:', resolved);
+        return resolved;
+    });
     
     // Store dropdown open states
     const [openDropdowns, setOpenDropdowns] = useState(new Set());
@@ -60,41 +77,57 @@ export function CardTemplateRenderer({ jsonTemplate, globalVars, onChange, onSav
 
     // If jsonTemplate or globalVars change, re-resolve and reset state
     useEffect(() => {
-        setTemplateState(resolveVars(jsonTemplate, globalVars));
+        const resolvedTemplate = resolveVars(jsonTemplate || [], globalVars);
+        // Only update if the resolved template is actually different from current state
+        setTemplateState(prevState => {
+            // Deep compare to avoid unnecessary updates
+            if (JSON.stringify(prevState) !== JSON.stringify(resolvedTemplate)) {
+                return resolvedTemplate;
+            }
+            return prevState;
+        });
     }, [jsonTemplate, globalVars]);
-
-    // Notify parent of changes
-    useEffect(() => {
-        if (onChangeRef.current) {
-            onChangeRef.current(templateState);
-        }
-    }, [templateState]);
 
     // Helper to update a value at a given path in the templateState
     const updateValueAtPath = useCallback((path, newValue) => {
-        function update(obj, idx = 0) {
-            if (idx === path.length - 1) {
+        console.log('updateValueAtPath called with:', { path, newValue });
+        
+        function update(obj, pathIndex = 0) {
+            if (pathIndex === path.length - 1) {
                 // At the target object
+                console.log('Updating object at path:', path, 'with value:', newValue);
                 return { ...obj, value: newValue };
             }
-            if (obj.children && Array.isArray(obj.children)) {
-                const childIdx = path[idx + 1];
+            
+            const currentPathIndex = path[pathIndex];
+            
+            if (Array.isArray(obj)) {
+                // Handle array case
+                return obj.map((item, i) => 
+                    i === currentPathIndex ? update(item, pathIndex + 1) : item
+                );
+            } else if (obj && typeof obj === 'object' && obj.children && Array.isArray(obj.children)) {
+                // Handle object with children array
                 return {
                     ...obj,
                     children: obj.children.map((child, i) =>
-                        i === childIdx ? update(child, idx + 1) : child
+                        i === currentPathIndex ? update(child, pathIndex + 1) : child
                     ),
                 };
             }
+            
             return obj;
         }
+        
         setTemplateState(prev => {
-            // path[0] is the index in the root array
             if (Array.isArray(prev)) {
-                const rootIdx = path[0];
-                return prev.map((item, i) =>
-                    i === rootIdx ? update(item, 0) : item
-                );
+                const newState = update(prev, 0);
+                console.log('New state:', newState);
+                // Call onChange with the new state when user makes changes
+                if (onChangeRef.current) {
+                    onChangeRef.current(newState);
+                }
+                return newState;
             }
             return prev;
         });
@@ -157,7 +190,10 @@ export function CardTemplateRenderer({ jsonTemplate, globalVars, onChange, onSav
                             <input
                                 type="text"
                                 value={value || ''}
-                                onChange={e => updateValueAtPath(path, e.target.value)}
+                                onChange={e => {
+                                    console.log('Itext onChange triggered:', e.target.value);
+                                    updateValueAtPath(path, e.target.value);
+                                }}
                                 className="border border-gray-300 rounded px-2 py-1"
                                 placeholder={title ? title.toLowerCase() : ''}
                             />
@@ -188,7 +224,10 @@ export function CardTemplateRenderer({ jsonTemplate, globalVars, onChange, onSav
                             <input
                                 type="checkbox"
                                 checked={!!value}
-                                onChange={e => updateValueAtPath(path, e.target.checked)}
+                                onChange={e => {
+                                    console.log('IBool onChange triggered:', e.target.checked);
+                                    updateValueAtPath(path, e.target.checked);
+                                }}
                                 className="accent-black"
                             />
                         </div>
@@ -246,7 +285,10 @@ export function CardTemplateRenderer({ jsonTemplate, globalVars, onChange, onSav
                             {title && <label className="mb-1 text-sm font-medium text-gray-700">{title}</label>}
                             <textarea
                                 value={value || ''}
-                                onChange={e => updateValueAtPath(path, e.target.value)}
+                                onChange={e => {
+                                    console.log('Imultiline onChange triggered:', e.target.value);
+                                    updateValueAtPath(path, e.target.value);
+                                }}
                                 rows={4}
                                 className="w-full border border-gray-300 rounded px-2 py-1 resize-none"
                                 placeholder={title ? title.toLowerCase() : ''}
@@ -292,6 +334,7 @@ export function CardTemplateRenderer({ jsonTemplate, globalVars, onChange, onSav
                                         <div
                                             className="px-2 py-1 text-sm text-gray-500 cursor-pointer hover:bg-gray-100"
                                             onClick={() => {
+                                                console.log('IChoice clear selection clicked');
                                                 updateValueAtPath(path, '');
                                                 closeDropdown(path);
                                             }}
@@ -303,6 +346,7 @@ export function CardTemplateRenderer({ jsonTemplate, globalVars, onChange, onSav
                                                 key={index}
                                                 className="px-2 py-1 text-sm cursor-pointer hover:bg-gray-100"
                                                 onClick={() => {
+                                                    console.log('IChoice selection clicked:', choice);
                                                     updateValueAtPath(path, choice);
                                                     closeDropdown(path);
                                                 }}
@@ -334,7 +378,19 @@ export function CardTemplateRenderer({ jsonTemplate, globalVars, onChange, onSav
     return (
         <div className='w-full h-full'>
             {renderNode(templateState)}
-            <button className='bg-blue-500 text-white px-4 py-2 rounded-md' onClick={() => onSave(templateState)}>Save</button>
+            <div className="mt-4 p-4 bg-gray-100 rounded">
+                <p className="text-sm text-gray-600 mb-2">Debug: Test interactive elements</p>
+                <button 
+                    className='bg-green-500 text-white px-4 py-2 rounded-md mr-2' 
+                    onClick={() => {
+                        console.log('Test button clicked');
+                        updateValueAtPath([0, 0, 0], 'Test Value');
+                    }}
+                >
+                    Test Update First Field
+                </button>
+                <button className='bg-blue-500 text-white px-4 py-2 rounded-md' onClick={() => onSave(templateState)}>Save</button>
+            </div>
         </div>
     );
 }
