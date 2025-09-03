@@ -104,7 +104,7 @@ export default function ViewForm() {
         api.post(`/task-responses/${id}/generate_pdf/`)
         .then((res) => {
             console.log(res);
-            window.open(res.data.download_url, '_blank');
+            window.open(`https://api.velia.se${res.data.download_url}`, '_blank');
         })
         .catch((err) => {
             console.error("Failed to generate PDF:", err);
