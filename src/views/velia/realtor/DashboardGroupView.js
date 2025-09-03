@@ -306,7 +306,7 @@ export default function DashboardGroupView() {
                             // "Screening": task.title.includes("Screening") ? "Ja" : "Nej",
                             "adress": task.customer_response?.answers[0]?.questions[2]?.value,
                             "screening_results": "No Screening Results",
-                            "id_kontroll": (task.customer_response?.created_at !== task.customer_response?.updated_at) ? "Ja" : "Nej",
+                            "id_kontroll": (task.customer.verified) ? "Ja" : "Nej",
                             "formURL": `https://www.velia.se/${task.customer?.organisation?.name}/customer/dashboard/task/${task.customer_response?.id}`
                         } : {}),
                     }}
