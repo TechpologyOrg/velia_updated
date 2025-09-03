@@ -327,7 +327,6 @@ export function CardTemplateRenderer({ jsonTemplate, globalVars, onChange, onSav
                 {title && <div className="mb-1 text-sm font-medium text-gray-700">{title}</div>}
                 {value && value}
                 {children && renderNode(children, [...path, 'children'])}
-                <button className='bg-blue-500 text-white px-4 py-2 rounded-md' onClick={() => onSave(templateState)}>Save</button>
             </Tag>
         );
     }
@@ -335,6 +334,7 @@ export function CardTemplateRenderer({ jsonTemplate, globalVars, onChange, onSav
     return (
         <div className='w-full h-full'>
             {renderNode(templateState)}
+            <button className='bg-blue-500 text-white px-4 py-2 rounded-md' onClick={() => onSave(templateState)}>Save</button>
         </div>
     );
 }
