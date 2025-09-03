@@ -5,28 +5,21 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
  * Mutates a copy of the input json.
  */
 function resolveVars(json, globalVars) {
-    console.log('resolveVars called with:', { json, globalVars });
-    
     if (!json || !Array.isArray(json)) {
         return [];
     }
     
     function getVarValue(varKey) {
         if (globalVars && varKey in globalVars) {
-            const value = globalVars[varKey];
-            console.log(`Resolved var "${varKey}" to:`, value);
-            return value;
+            return globalVars[varKey];
         }
         if (globalVars && globalVars.misc && Array.isArray(globalVars.misc)) {
             for (const miscObj of globalVars.misc) {
                 if (varKey in miscObj) {
-                    const value = miscObj[varKey];
-                    console.log(`Resolved var "${varKey}" from misc to:`, value);
-                    return value;
+                    return miscObj[varKey];
                 }
             }
         }
-        console.log(`Could not resolve var "${varKey}", returning empty string`);
         return '';
     }
 
@@ -36,8 +29,11 @@ function resolveVars(json, globalVars) {
         } else if (obj && typeof obj === 'object') {
             let newObj = { ...obj };
             if ('var' in newObj) {
-                const val = getVarValue(newObj['var']);
-                newObj.value = val;
+                // Only resolve the var if the value is empty or hasn't been set by user
+                if (!newObj.value || newObj.value === '') {
+                    const val = getVarValue(newObj['var']);
+                    newObj.value = val;
+                }
             }
             if (newObj.children) {
                 newObj.children = traverse(newObj.children);
@@ -47,9 +43,7 @@ function resolveVars(json, globalVars) {
         return obj;
     }
 
-    const result = traverse(json);
-    console.log('resolveVars result:', result);
-    return result;
+    return traverse(json);
 }
 
 /**
