@@ -283,7 +283,7 @@ export default function DashboardGroupView() {
                     key={task.id}
                     task={task}
                     cardJson={task.realtor_card}
-                    onSave={handleSaveCardJson}
+                    onSave={(e) => handleSaveCardJson(e, task.id)}
                     setCardJson={updatedCardJson => {
                         setTasks(prevTasks =>
                             prevTasks.map(t =>
@@ -349,8 +349,8 @@ export default function DashboardGroupView() {
         }
     ]);
 
-    const handleSaveCardJson = (cardJson) => {
-        api.put(`/tasks/${task.id}/update_realtor_card/`, {
+    const handleSaveCardJson = (cardJson, id) => {
+        api.put(`/tasks/${_id}/update_realtor_card/`, {
             realtor_card: cardJson
         })
         .then(resp => {
