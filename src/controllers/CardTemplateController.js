@@ -32,6 +32,7 @@ function resolveVars(json, globalVars) {
                 // Only resolve the var if the value is empty or hasn't been set by user
                 if (!newObj.value || newObj.value === '') {
                     const val = getVarValue(newObj['var']);
+                    console.log(`Resolving var "${newObj['var']}" to:`, val, 'for tag:', newObj.tag);
                     newObj.value = val;
                 }
             }

@@ -285,13 +285,13 @@ export default function DashboardGroupView() {
                 "födelsedag": task.customer?.personnummer.slice(0, 4) + "-" + task.customer?.personnummer.slice(4, 6) + "-" + task.customer?.personnummer.slice(6, 8),
                 "email": task.customer?.email,
                 "ägarandel": task.customer?.ägarandel,
+                "formURL": `https://www.velia.se/${task.customer?.organisation?.name}/customer/dashboard/task/${task.customer_response?.id}`,
                 // If the task has a property "extraVars", spread its keys into globalVars
                 ...(task.title.includes("KYC") ? {
                     // "Screening": task.title.includes("Screening") ? "Ja" : "Nej",
                     "adress": task.customer_response?.answers[0]?.questions[2]?.value,
                     "screening_results": "No Screening Results",
                     "id_kontroll": (task.customer.verified) ? "Ja" : "Nej",
-                    "formURL": `https://www.velia.se/${task.customer?.organisation?.name}/customer/dashboard/task/${task.customer_response?.id}`
                 } : {}),
             };
             console.log("Rendering TaskCard with globalVars:", taskGlobalVars);
