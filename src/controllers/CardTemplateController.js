@@ -370,7 +370,7 @@ export function CardTemplateRenderer({ jsonTemplate, globalVars, onChange, onSav
     return (
         <div className='w-full h-full'>
             {renderNode(templateState)}
-            <div className="mt-4 p-4 bg-gray-100 rounded">
+            <div className="mt-4 p-4 bg-gray-100 rounded items-center justify-end flex">
                 <button className='bg-blue-500 text-white px-4 py-2 rounded-md' onClick={() => onSave(templateState)}>Save</button>
             </div>
         </div>
