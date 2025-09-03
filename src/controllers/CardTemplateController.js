@@ -86,44 +86,32 @@ export function CardTemplateRenderer({ jsonTemplate, globalVars, onChange, onSav
     const updateValueAtPath = useCallback((path, newValue) => {
         console.log('updateValueAtPath called with:', { path, newValue });
         
-        function update(obj, pathIndex = 0) {
-            if (pathIndex === path.length - 1) {
-                // At the target object
-                console.log('Updating object at path:', path, 'with value:', newValue);
-                return { ...obj, value: newValue };
-            }
-            
-            const currentPathIndex = path[pathIndex];
-            
-            if (Array.isArray(obj)) {
-                // Handle array case
-                return obj.map((item, i) => 
-                    i === currentPathIndex ? update(item, pathIndex + 1) : item
-                );
-            } else if (obj && typeof obj === 'object' && obj.children && Array.isArray(obj.children)) {
-                // Handle object with children array
-                return {
-                    ...obj,
-                    children: obj.children.map((child, i) =>
-                        i === currentPathIndex ? update(child, pathIndex + 1) : child
-                    ),
-                };
-            }
-            
-            return obj;
-        }
-        
         setTemplateState(prev => {
-            if (Array.isArray(prev)) {
-                const newState = update(prev, 0);
-                console.log('New state:', newState);
-                // Call onChange with the new state when user makes changes
-                if (onChangeRef.current) {
-                    onChangeRef.current(newState);
+            const newState = [...prev];
+            let current = newState;
+            
+            // Navigate to the parent of the target object
+            for (let i = 0; i < path.length - 1; i++) {
+                const index = path[i];
+                if (current[index] && current[index].children) {
+                    current = current[index].children;
+                } else {
+                    current = current[index];
                 }
-                return newState;
             }
-            return prev;
+            
+            // Update the value of the target object
+            const targetIndex = path[path.length - 1];
+            if (current[targetIndex]) {
+                current[targetIndex] = { ...current[targetIndex], value: newValue };
+            }
+            
+            console.log('New state:', newState);
+            // Call onChange with the new state when user makes changes
+            if (onChangeRef.current) {
+                onChangeRef.current(newState);
+            }
+            return newState;
         });
     }, []);
 
