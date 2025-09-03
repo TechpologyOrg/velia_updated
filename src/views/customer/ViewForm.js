@@ -100,6 +100,17 @@ export default function ViewForm() {
         }
     };
 
+    const genPDF = () => {
+        api.post(`/task-responses/${id}/generate-pdf/`)
+        .then((res) => {
+            console.log(res);
+            window.open(res.data.download_url, '_blank');
+        })
+        .catch((err) => {
+            console.error("Failed to generate PDF:", err);
+        });
+    }
+
     return (
         <div className='flex flex-col w-full h-full items-center justify-center p-4'>
             {/* Main Form Window */}
@@ -148,6 +159,14 @@ export default function ViewForm() {
                     }}
                 >
                     Klar
+                </button>
+                <button
+                    className='px-6 py-3 bg-black hover:bg-gray-800 transition-colors duration-200 cursor-pointer text-white rounded-lg font-medium text-base shadow-lg hover:shadow-xl transform hover:scale-105'
+                    onClick={() => {
+                        genPDF();
+                    }}
+                >
+                    Generera PDF
                 </button>
             </div>
         </div>
