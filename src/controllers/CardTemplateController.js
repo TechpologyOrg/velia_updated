@@ -45,7 +45,7 @@ function resolveVars(json, globalVars) {
  * @param {Object} props.globalVars - The global variables object.
  * @param {Function} props.onChange - Callback to parent with updated JSON.
  */
-export function CardTemplateRenderer({ jsonTemplate, globalVars, onChange }) {
+export function CardTemplateRenderer({ jsonTemplate, globalVars, onChange, onSave }) {
     // We keep a local state for the working JSON, so we can update values as user interacts
     const [templateState, setTemplateState] = useState(() =>
         resolveVars(jsonTemplate, globalVars)
@@ -199,7 +199,7 @@ export function CardTemplateRenderer({ jsonTemplate, globalVars, onChange }) {
             if (tag === 'Ibutton') {
                 if (type && type.toLowerCase() === 'display') {
                     return (
-                        <div key={path.join('-')} className={className || ''}>
+                        <div key={path.join('-')} className={(className || '') + ' gap-2'}>
                             {title && <label className="mb-1 text-sm font-medium text-gray-700">{title}</label>}
                             <button
                                 className="px-4 py-2 bg-gray-100 border border-gray-300 rounded text-gray-500 cursor-not-allowed"
@@ -334,6 +334,7 @@ export function CardTemplateRenderer({ jsonTemplate, globalVars, onChange }) {
     return (
         <div className='w-full h-full'>
             {renderNode(templateState)}
+            <button className='absolute bottom-2 right-2 bg-blue-500 text-white px-4 py-2 rounded-md' onClick={() => onSave(templateState)}>Save</button>
         </div>
     );
 }
