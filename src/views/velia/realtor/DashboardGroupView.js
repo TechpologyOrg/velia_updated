@@ -72,7 +72,7 @@ function TaskCard({ task, children, cardJson, setCardJson, globalVars }) {
                     {children ? children : (
                         <div className="text-neutral-600 text-sm flex flex-col gap-2">
                             <div className='flex flex-row w-full items-center justify-between'>
-                                <CardTemplateRenderer jsonTemplate={cardJson} globalVars={globalVars} onChange={setCardJson} />
+                                <CardTemplateRenderer jsonTemplate={cardJson} globalVars={globalVars} onChange={setCardJson} onSave={onSave} />
                             </div>
                         </div>
                     )}
