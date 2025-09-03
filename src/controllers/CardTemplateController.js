@@ -87,23 +87,28 @@ export function CardTemplateRenderer({ jsonTemplate, globalVars, onChange, onSav
         console.log('updateValueAtPath called with:', { path, newValue });
         
         setTemplateState(prev => {
-            const newState = [...prev];
+            const newState = JSON.parse(JSON.stringify(prev)); // Deep clone
             let current = newState;
             
             // Navigate to the parent of the target object
             for (let i = 0; i < path.length - 1; i++) {
                 const index = path[i];
-                if (current[index] && current[index].children) {
-                    current = current[index].children;
+                if (current && current[index]) {
+                    if (current[index].children) {
+                        current = current[index].children;
+                    } else {
+                        current = current[index];
+                    }
                 } else {
-                    current = current[index];
+                    console.error('Invalid path:', path);
+                    return prev;
                 }
             }
             
             // Update the value of the target object
             const targetIndex = path[path.length - 1];
-            if (current[targetIndex]) {
-                current[targetIndex] = { ...current[targetIndex], value: newValue };
+            if (current && current[targetIndex]) {
+                current[targetIndex].value = newValue;
             }
             
             console.log('New state:', newState);
