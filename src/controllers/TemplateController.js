@@ -218,8 +218,12 @@ export function GenerateForm({ Form, SetForm, template, vars }) {
 }
 
 export function GenerateTemplate({ template, SetTemplate, onFormChange }) {
+    console.log('GenerateTemplate received template:', template);
+    
     // Defensive copy to avoid mutating the original template
     const safeTemplate = Array.isArray(template.answers) ? template.answers : [];
+    console.log('Safe template (answers):', safeTemplate);
+    
     const [pageIndex, setPageIndex] = useState(0);
 
     return (

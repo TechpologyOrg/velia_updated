@@ -14,15 +14,21 @@ export default function ViewForm() {
     useEffect(() => {
         api.get(`/task-responses/${id}/`)
             .then((res) => {
+                console.log('API response:', res.data);
                 if (res.data && res.data.answers) {
-                    // add a key to the template named "vars" with the value being an object
-                    setTemplate({answers: res.data.answers, vars: {
-                        "customer_full_name": res.data.customer.first_name + " " + res.data.customer.last_name,
-                        "customer_personnummer": res.data.customer.personnummer,
-                        "customer_email": res.data.customer.email
-                    },
-                    title: res.data.task.title,
-                    description: res.data.task.description
+                    // Ensure answers is an array and has the correct structure
+                    const answers = Array.isArray(res.data.answers) ? res.data.answers : [];
+                    console.log('Processed answers:', answers);
+                    
+                    setTemplate({
+                        answers: answers,
+                        vars: {
+                            "customer_full_name": res.data.customer.first_name + " " + res.data.customer.last_name,
+                            "customer_personnummer": res.data.customer.personnummer,
+                            "customer_email": res.data.customer.email
+                        },
+                        title: res.data.task.title,
+                        description: res.data.task.description
                     });
                 } else {
                     console.error("No template found in response:", res.data);
