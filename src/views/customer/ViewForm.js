@@ -101,7 +101,7 @@ export default function ViewForm() {
     };
 
     const genPDF = () => {
-        api.post(`/task-responses/${id}/generate-pdf/`)
+        api.post(`/task-responses/${id}/generate_pdf/`)
         .then((res) => {
             console.log(res);
             window.open(res.data.download_url, '_blank');
