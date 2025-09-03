@@ -224,6 +224,7 @@ export function CardTemplateRenderer({ jsonTemplate, globalVars, onChange, onSav
             }
             // Ibutton
             if (tag === 'Ibutton') {
+                console.log('Rendering Ibutton with:', { tag, title, value, var: node.var });
                 if (type && type.toLowerCase() === 'display') {
                     return (
                         <div key={path.join('-')} className={(className || '') + ' gap-2 flex flex-row items-center'}>
@@ -243,7 +244,10 @@ export function CardTemplateRenderer({ jsonTemplate, globalVars, onChange, onSav
                             {title && <label className="mb-1 text-sm font-medium text-gray-700">{title}</label>}
                             <button
                                 className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors"
-                                onClick={() => window.open(value || '#', '_blank')}
+                                onClick={() => {
+                                    console.log('Ibutton clicked, value:', value, 'var:', node.var);
+                                    window.open(value || '#', '_blank');
+                                }}
                             >
                                 {title || 'Button'}
                             </button>
