@@ -90,14 +90,14 @@ export function CardTemplateRenderer({ jsonTemplate, globalVars, onChange, onSav
             const newState = JSON.parse(JSON.stringify(prev)); // Deep clone
             let current = newState;
             
-            // Navigate to the parent of the target object
+            // Navigate to the target object
             for (let i = 0; i < path.length - 1; i++) {
-                const index = path[i];
-                if (current && current[index]) {
-                    if (current[index].children) {
-                        current = current[index].children;
+                const pathElement = path[i];
+                if (current && current[pathElement]) {
+                    if (pathElement === 'children') {
+                        current = current.children;
                     } else {
-                        current = current[index];
+                        current = current[pathElement];
                     }
                 } else {
                     console.error('Invalid path:', path);
