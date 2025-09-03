@@ -286,15 +286,23 @@ export default function DashboardGroupView() {
                 "email": task.customer?.email,
                 "ägarandel": task.customer?.ägarandel,
                 "formURL": `https://www.velia.se/${task.customer?.organisation?.name}/customer/dashboard/task/${task.customer_response?.id}`,
-                // If the task has a property "extraVars", spread its keys into globalVars
-                ...(task.title.includes("KYC") ? {
-                    // "Screening": task.title.includes("Screening") ? "Ja" : "Nej",
+            };
+            
+            // If the task has a property "extraVars", spread its keys into globalVars
+            if (task.title.includes("KYC")) {
+                console.log("KYC task detected:", task.title);
+                const kycVars = {
                     "adress": task.customer_response?.answers[0]?.questions[2]?.value,
                     "screening_results": "No Screening Results",
                     "id_kontroll": (task.customer.verified) ? "Ja" : "Nej",
-                } : {}),
-            };
-            console.log("Rendering TaskCard with globalVars:", taskGlobalVars);
+                };
+                console.log("Adding KYC vars:", kycVars);
+                taskGlobalVars = { ...taskGlobalVars, ...kycVars };
+            } else {
+                console.log("Non-KYC task:", task.title);
+            }
+            
+            console.log("Final taskGlobalVars:", taskGlobalVars);
             return (
                 <TaskCard
                     key={task.id}
