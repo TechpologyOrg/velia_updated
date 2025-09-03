@@ -278,7 +278,7 @@ export default function DashboardGroupView() {
     }
     const renderTasks = () => {
         return tasks.map((task) => {
-            const taskGlobalVars = {
+            let taskGlobalVars = {
                 ...globalVars,
                 "namn": `${task.customer?.first_name} ${task.customer?.last_name}`,
                 "personnummer": task.customer?.personnummer,
