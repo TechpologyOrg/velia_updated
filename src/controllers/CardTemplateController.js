@@ -199,7 +199,7 @@ export function CardTemplateRenderer({ jsonTemplate, globalVars, onChange, onSav
             if (tag === 'Ibutton') {
                 if (type && type.toLowerCase() === 'display') {
                     return (
-                        <div key={path.join('-')} className={(className || '') + ' gap-2'}>
+                        <div key={path.join('-')} className={(className || '') + ' gap-2 flex flex-row items-center'}>
                             {title && <label className="mb-1 text-sm font-medium text-gray-700">{title}</label>}
                             <button
                                 className="px-4 py-2 bg-gray-100 border border-gray-300 rounded text-gray-500 cursor-not-allowed"
@@ -212,7 +212,7 @@ export function CardTemplateRenderer({ jsonTemplate, globalVars, onChange, onSav
                 } else {
                     // Editable or standard
                     return (
-                        <div key={path.join('-')} className={className || ''}>
+                        <div key={path.join('-')} className={(className || '') + ' gap-2 flex flex-row items-center'}>
                             {title && <label className="mb-1 text-sm font-medium text-gray-700">{title}</label>}
                             <button
                                 className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors"
@@ -327,6 +327,7 @@ export function CardTemplateRenderer({ jsonTemplate, globalVars, onChange, onSav
                 {title && <div className="mb-1 text-sm font-medium text-gray-700">{title}</div>}
                 {value && value}
                 {children && renderNode(children, [...path, 'children'])}
+                <button className='bg-blue-500 text-white px-4 py-2 rounded-md' onClick={() => onSave(templateState)}>Save</button>
             </Tag>
         );
     }
@@ -334,7 +335,6 @@ export function CardTemplateRenderer({ jsonTemplate, globalVars, onChange, onSav
     return (
         <div className='w-full h-full'>
             {renderNode(templateState)}
-            <button className='absolute bottom-2 right-2 bg-blue-500 text-white px-4 py-2 rounded-md' onClick={() => onSave(templateState)}>Save</button>
         </div>
     );
 }
