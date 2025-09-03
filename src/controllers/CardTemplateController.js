@@ -371,16 +371,6 @@ export function CardTemplateRenderer({ jsonTemplate, globalVars, onChange, onSav
         <div className='w-full h-full'>
             {renderNode(templateState)}
             <div className="mt-4 p-4 bg-gray-100 rounded">
-                <p className="text-sm text-gray-600 mb-2">Debug: Test interactive elements</p>
-                <button 
-                    className='bg-green-500 text-white px-4 py-2 rounded-md mr-2' 
-                    onClick={() => {
-                        console.log('Test button clicked');
-                        updateValueAtPath([0, 0, 0], 'Test Value');
-                    }}
-                >
-                    Test Update First Field
-                </button>
                 <button className='bg-blue-500 text-white px-4 py-2 rounded-md' onClick={() => onSave(templateState)}>Save</button>
             </div>
         </div>
