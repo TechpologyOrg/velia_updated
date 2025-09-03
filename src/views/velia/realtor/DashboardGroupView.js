@@ -7,7 +7,7 @@ import V_Popup from '../../../components/V_Popup';
 import { FaPlus } from 'react-icons/fa';
 import { FaChevronDown, FaChevronRight } from 'react-icons/fa';
 
-function TaskCard({ task, children, cardJson, setCardJson, globalVars }) {
+function TaskCard({ task, children, cardJson, setCardJson, globalVars, onSave }) {
     const [open, setOpen] = useState(false);
 
     // Simple status color mapping
