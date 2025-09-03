@@ -349,7 +349,7 @@ export default function DashboardGroupView() {
         }
     ]);
 
-    const handleSaveCardJson = (cardJson, id) => {
+    const handleSaveCardJson = (cardJson, _id) => {
         api.put(`/tasks/${_id}/update_realtor_card/`, {
             realtor_card: cardJson
         })
