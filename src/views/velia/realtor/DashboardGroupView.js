@@ -381,7 +381,7 @@ export default function DashboardGroupView() {
                 <p className='text-neutral-800 text-xl'>{group.postnummer}, {group.ort}</p>
             </div>
             <p className="text-neutral-500 text-lg">Visa och hantera grupp</p>
-            <p className='text-blue-400 text-sm cursor-pointer' >{`https://www.velia.se/${group.organisation.name}/customer/login`}</p>
+            <p className='text-blue-400 text-sm cursor-pointer' >{`https://www.velia.se/${group.customers[0].organisation.name}/customer/login?oid=${group.customers[0].organisation.id}&organisation=${group.customers[0].organisation.name}`}</p>
 
             <div className='flex flex-row w-full flex-wrap md:flex-nowrap items-center justify-between mt-8'>
                 <div className='flex flex-col w-full md:w-[200px] py-4'>
