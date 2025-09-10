@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { IToggle, Imultiline, IChoice, IBool, Itext, Ibutton, I_V_Button } from '../components/template';
 
 /**
  * Recursively resolves "var" keys in the json array using globalVars.
@@ -63,9 +64,6 @@ export function CardTemplateRenderer({ jsonTemplate, globalVars, onChange, onSav
         return resolved;
     });
     
-    // Store dropdown open states
-    const [openDropdowns, setOpenDropdowns] = useState(new Set());
-    
     // Store the latest onChange function in a ref to avoid infinite re-renders
     const onChangeRef = useRef(onChange);
     onChangeRef.current = onChange;
@@ -121,29 +119,6 @@ export function CardTemplateRenderer({ jsonTemplate, globalVars, onChange, onSav
         });
     }, []);
 
-    // Helper to toggle dropdown state
-    const toggleDropdown = useCallback((path) => {
-        setOpenDropdowns(prev => {
-            const newSet = new Set(prev);
-            const pathKey = path.join('-');
-            if (newSet.has(pathKey)) {
-                newSet.delete(pathKey);
-            } else {
-                newSet.add(pathKey);
-            }
-            return newSet;
-        });
-    }, []);
-
-    // Helper to close dropdown
-    const closeDropdown = useCallback((path) => {
-        setOpenDropdowns(prev => {
-            const newSet = new Set(prev);
-            newSet.delete(path.join('-'));
-            return newSet;
-        });
-    }, []);
-
     // Recursive renderer
     function renderNode(node, path = []) {
         if (Array.isArray(node)) {
@@ -157,256 +132,99 @@ export function CardTemplateRenderer({ jsonTemplate, globalVars, onChange, onSav
         if (tag && tag.startsWith('I')) {
             // Itext
             if (tag === 'Itext') {
-                if (type && type.toLowerCase() === 'display') {
-                    return (
-                        <div key={path.join('-')} className={className || ''}>
-                            {title && <label className="mb-1 text-sm font-medium text-gray-700">{title}</label>}
-                            <input
-                                type="text"
-                                value={value || ''}
-                                readOnly
-                                className="bg-gray-100 border border-gray-300 rounded px-2 py-1"
-                                placeholder={title ? title.toLowerCase() : ''}
-                            />
-                        </div>
-                    );
-                } else {
-                    // Editable or standard
-                    return (
-                        <div key={path.join('-')} className={className || ''}>
-                            {title && <label className="mb-1 text-sm font-medium text-gray-700">{title}</label>}
-                            <input
-                                type="text"
-                                value={value || ''}
-                                onChange={e => {
-                                    console.log('Itext onChange triggered:', e.target.value);
-                                    updateValueAtPath(path, e.target.value);
-                                }}
-                                className="border border-gray-300 rounded px-2 py-1"
-                                placeholder={title ? title.toLowerCase() : ''}
-                            />
-                        </div>
-                    );
-                }
+                return (
+                    <Itext
+                        key={path.join('-')}
+                        title={title}
+                        type={type}
+                        value={value}
+                        className={className}
+                        onChange={(newValue) => updateValueAtPath(path, newValue)}
+                    />
+                );
             }
             // IBool
             if (tag === 'IBool') {
-                if (type && type.toLowerCase() === 'display') {
-                    return (
-                        <div key={path.join('-')} className={className || ''}>
-                            {title && <label className="mb-1 text-sm font-medium text-gray-700">{title}</label>}
-                            <input
-                                type="checkbox"
-                                checked={!!value}
-                                readOnly
-                                className="accent-black"
-                                style={{ pointerEvents: 'none' }}
-                            />
-                        </div>
-                    );
-                } else {
-                    // Editable or standard
-                    return (
-                        <div key={path.join('-')} className={className || ''}>
-                            {title && <label className="mb-1 text-sm font-medium text-gray-700">{title}</label>}
-                            <input
-                                type="checkbox"
-                                checked={!!value}
-                                onChange={e => {
-                                    console.log('IBool onChange triggered:', e.target.checked);
-                                    updateValueAtPath(path, e.target.checked);
-                                }}
-                                className="accent-black"
-                            />
-                        </div>
-                    );
-                }
+                return (
+                    <IBool
+                        key={path.join('-')}
+                        title={title}
+                        type={type}
+                        value={value}
+                        className={className}
+                        onChange={(newValue) => updateValueAtPath(path, newValue)}
+                    />
+                );
             }
             // Ibutton
             if (tag === 'Ibutton') {
-                console.log('Rendering Ibutton with:', { tag, title, value, var: node.var });
-                if (type && type.toLowerCase() === 'display') {
-                    return (
-                        <div key={path.join('-')} className={(className || '') + ' gap-2 flex flex-row items-center'}>
-                            {title && <label className="mb-1 text-sm font-medium text-gray-700">{title}</label>}
-                            <button
-                                className="px-4 py-2 bg-gray-100 border border-gray-300 rounded text-gray-500 cursor-not-allowed"
-                                disabled
-                            >
-                                {title || 'Button'}
-                            </button>
-                        </div>
-                    );
-                } else {
-                    // Editable or standard
-                    return (
-                        <div key={path.join('-')} className={(className || '') + ' gap-2 flex flex-row items-center'}>
-                            {title && <label className="mb-1 text-sm font-medium text-gray-700">{title}</label>}
-                            <button
-                                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors"
-                                onClick={() => {
-                                    console.log('Ibutton clicked, value:', value, 'var:', node.var);
-                                    window.open(value || '#', '_blank');
-                                }}
-                            >
-                                {title || 'Button'}
-                            </button>
-                        </div>
-                    );
-                }
+                return (
+                    <Ibutton
+                        key={path.join('-')}
+                        title={title}
+                        type={type}
+                        value={value}
+                        className={className}
+                        var={node.var}
+                    />
+                );
             }
             // Imultiline
             if (tag === 'Imultiline') {
-                if (type && type.toLowerCase() === 'display') {
-                    return (
-                        <div key={path.join('-')} className={className || ''}>
-                            {title && <label className="mb-1 text-sm font-medium text-gray-700">{title}</label>}
-                            <textarea
-                                value={value || ''}
-                                readOnly
-                                rows={4}
-                                className="w-full bg-gray-100 border border-gray-300 rounded px-2 py-1 resize-none"
-                                placeholder={title ? title.toLowerCase() : ''}
-                            />
-                        </div>
-                    );
-                } else {
-                    // Editable or standard
-                    return (
-                        <div key={path.join('-')} className={className || ''}>
-                            {title && <label className="mb-1 text-sm font-medium text-gray-700">{title}</label>}
-                            <textarea
-                                value={value || ''}
-                                onChange={e => {
-                                    console.log('Imultiline onChange triggered:', e.target.value);
-                                    updateValueAtPath(path, e.target.value);
-                                }}
-                                rows={4}
-                                className="w-full border border-gray-300 rounded px-2 py-1 resize-none"
-                                placeholder={title ? title.toLowerCase() : ''}
-                            />
-                        </div>
-                    );
-                }
+                return (
+                    <Imultiline
+                        key={path.join('-')}
+                        title={title}
+                        type={type}
+                        value={value}
+                        className={className}
+                        onChange={(newValue) => updateValueAtPath(path, newValue)}
+                    />
+                );
             }
             // IChoice
             if (tag === 'IChoice') {
-                const choices = node.choices || [];
-                const pathKey = path.join('-');
-                const isOpen = openDropdowns.has(pathKey);
-                
-                if (type && type.toLowerCase() === 'display') {
-                    return (
-                        <div key={path.join('-')} className={className || ''}>
-                            {title && <label className="mb-1 text-sm font-medium text-gray-700">{title}</label>}
-                            <div className="w-full bg-gray-100 border border-gray-300 rounded px-2 py-1 text-gray-500">
-                                {value || (title ? `Select ${title.toLowerCase()}` : 'Select an option')}
-                            </div>
-                        </div>
-                    );
-                } else {
-                    // Editable or standard - Custom dropdown
-                    return (
-                        <div key={path.join('-')} className={className || ''} style={{ position: 'relative' }}>
-                            {title && <label className="mb-1 text-sm font-medium text-gray-700">{title}</label>}
-                            <div className="relative">
-                                <button
-                                    type="button"
-                                    onClick={() => toggleDropdown(path)}
-                                    className="w-full border border-gray-300 rounded px-2 py-1 text-left bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 flex justify-between items-center"
-                                >
-                                    <span>{value || (title ? `Select ${title.toLowerCase()}` : 'Select an option')}</span>
-                                    <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                                    </svg>
-                                </button>
-                                
-                                {isOpen && (
-                                    <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto">
-                                        <div
-                                            className="px-2 py-1 text-sm text-gray-500 cursor-pointer hover:bg-gray-100"
-                                            onClick={() => {
-                                                console.log('IChoice clear selection clicked');
-                                                updateValueAtPath(path, '');
-                                                closeDropdown(path);
-                                            }}
-                                        >
-                                            {title ? `Select ${title.toLowerCase()}` : 'Select an option'}
-                                        </div>
-                                        {choices.map((choice, index) => (
-                                            <div
-                                                key={index}
-                                                className="px-2 py-1 text-sm cursor-pointer hover:bg-gray-100"
-                                                onClick={() => {
-                                                    console.log('IChoice selection clicked:', choice);
-                                                    updateValueAtPath(path, choice);
-                                                    closeDropdown(path);
-                                                }}
-                                            >
-                                                {choice}
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    );
-                }
+                return (
+                    <IChoice
+                        key={path.join('-')}
+                        title={title}
+                        type={type}
+                        value={value}
+                        choices={node.choices || []}
+                        className={className}
+                        onChange={(newValue) => updateValueAtPath(path, newValue)}
+                    />
+                );
             }
             // IToggle
             if (tag === 'IToggle') {
-                const options = node.options || [];
-                // value is the selected option (string or number)
-                if (type && type.toLowerCase() === 'display') {
-                    return (
-                        <div key={path.join('-')} className={className || ''}>
-                            {title && <div className="mb-1 text-sm font-medium text-gray-700">{title}</div>}
-                            <div className="flex flex-row gap-4">
-                                {options.map((option, idx) => (
-                                    <button
-                                        key={idx}
-                                        className={
-                                            "px-4 py-2 rounded border " +
-                                            (value === option
-                                                ? "bg-blue-500 text-white border-blue-500"
-                                                : "bg-gray-100 text-gray-500 border-gray-300 cursor-not-allowed")
-                                        }
-                                        disabled
-                                    >
-                                        {option}
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-                    );
-                } else {
-                    // Editable or standard
-                    return (
-                        <div key={path.join('-')} className={className || ''}>
-                            {title && <div className="mb-1 text-sm font-medium text-gray-700">{title}</div>}
-                            <div className="flex flex-row gap-4">
-                                {options.map((option, idx) => (
-                                    <button
-                                        key={idx}
-                                        type="button"
-                                        className={
-                                            "px-4 py-2 rounded border transition-colors " +
-                                            (value === option
-                                                ? "bg-blue-500 text-white border-blue-500"
-                                                : "bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200")
-                                        }
-                                        onClick={() => {
-                                            console.log('IToggle option selected:', option);
-                                            updateValueAtPath(path, option);
-                                        }}
-                                    >
-                                        {option}
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-                    );
-                }
+                return (
+                    <IToggle
+                        key={path.join('-')}
+                        title={title}
+                        type={type}
+                        value={value}
+                        options={node.options || []}
+                        className={className}
+                        onChange={(newValue) => updateValueAtPath(path, newValue)}
+                    />
+                );
+            }
+            // I_V_Button
+            if (tag === 'I_V_Button') {
+                return (
+                    <I_V_Button
+                        key={path.join('-')}
+                        title={title}
+                        type={type}
+                        value={value}
+                        className={className}
+                        variant={node.variant}
+                        size={node.size}
+                        var={node.var}
+                        onChange={(newValue) => updateValueAtPath(path, newValue)}
+                    />
+                );
             }
             // Add more interactable tags as needed
         }
