@@ -353,6 +353,61 @@ export function CardTemplateRenderer({ jsonTemplate, globalVars, onChange, onSav
                     );
                 }
             }
+            // IToggle
+            if (tag === 'IToggle') {
+                const options = node.options || [];
+                // value is the selected option (string or number)
+                if (type && type.toLowerCase() === 'display') {
+                    return (
+                        <div key={path.join('-')} className={className || ''}>
+                            {title && <div className="mb-1 text-sm font-medium text-gray-700">{title}</div>}
+                            <div className="flex flex-row gap-4">
+                                {options.map((option, idx) => (
+                                    <button
+                                        key={idx}
+                                        className={
+                                            "px-4 py-2 rounded border " +
+                                            (value === option
+                                                ? "bg-blue-500 text-white border-blue-500"
+                                                : "bg-gray-100 text-gray-500 border-gray-300 cursor-not-allowed")
+                                        }
+                                        disabled
+                                    >
+                                        {option}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    );
+                } else {
+                    // Editable or standard
+                    return (
+                        <div key={path.join('-')} className={className || ''}>
+                            {title && <div className="mb-1 text-sm font-medium text-gray-700">{title}</div>}
+                            <div className="flex flex-row gap-4">
+                                {options.map((option, idx) => (
+                                    <button
+                                        key={idx}
+                                        type="button"
+                                        className={
+                                            "px-4 py-2 rounded border transition-colors " +
+                                            (value === option
+                                                ? "bg-blue-500 text-white border-blue-500"
+                                                : "bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200")
+                                        }
+                                        onClick={() => {
+                                            console.log('IToggle option selected:', option);
+                                            updateValueAtPath(path, option);
+                                        }}
+                                    >
+                                        {option}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    );
+                }
+            }
             // Add more interactable tags as needed
         }
 
