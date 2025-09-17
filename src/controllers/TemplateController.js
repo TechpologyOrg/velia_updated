@@ -66,6 +66,16 @@ PATH FORMATS:
 - "vars.customer_name": Variable reference
 - "123": Question ID reference (searches all forms)
 
+SUPPORTED QUESTION TYPES:
+------------------------
+- text: Single-line text input
+- numeric: Number input
+- choice: Single selection dropdown
+- boolean: Checkbox (true/false)
+- date: Date picker
+- display: Read-only display field (uses vars)
+- toggleList: Multiple selection checkboxes (semicolon-separated values)
+
 EXAMPLE TEMPLATE WITH VISIBILITY:
 ---------------------------------
 [
@@ -86,6 +96,13 @@ EXAMPLE TEMPLATE WITH VISIBILITY:
       },
       {
         "id": 3,
+        "title": "Skills",
+        "type": "toggleList",
+        "value": "",
+        "choices": ["JavaScript", "Python", "React", "Node.js", "SQL"]
+      },
+      {
+        "id": 4,
         "title": "Company Name",
         "type": "text",
         "value": "",
@@ -93,6 +110,17 @@ EXAMPLE TEMPLATE WITH VISIBILITY:
           "path": "2",
           "op": "equals", 
           "value": "employed"
+        }
+      },
+      {
+        "id": 5,
+        "title": "Senior Developer",
+        "type": "boolean",
+        "value": false,
+        "visibleWhen": {
+          "path": "3",
+          "op": "contains",
+          "value": "JavaScript"
         }
       }
     ]
@@ -107,8 +135,8 @@ EXAMPLE TEMPLATE WITH VISIBILITY:
       "value": "employed"
     },
     "questions": [
-      {"id": 4, "title": "Job Title", "type": "text", "value": ""},
-      {"id": 5, "title": "Salary", "type": "numeric", "value": 0}
+      {"id": 6, "title": "Job Title", "type": "text", "value": ""},
+      {"id": 7, "title": "Salary", "type": "numeric", "value": 0}
     ]
   }
 ]
@@ -378,6 +406,57 @@ export function GenerateForm({ Form, SetForm, template, vars }) {
                                         SetForm(updatedForm);
                                     }}
                                 />
+                            </div>
+                        )
+                    } else if (question.type === 'toggleList') {
+                        // Parse current value (semicolon-separated string)
+                        const selectedValues = question.value ? question.value.split(';').filter(v => v.trim() !== '') : [];
+                        
+                        const handleToggleChange = (choiceValue, isSelected) => {
+                            let newSelectedValues;
+                            if (isSelected) {
+                                // Add to selection
+                                newSelectedValues = [...selectedValues, choiceValue];
+                            } else {
+                                // Remove from selection
+                                newSelectedValues = selectedValues.filter(v => v !== choiceValue);
+                            }
+                            
+                            // Convert back to semicolon-separated string
+                            const newValue = newSelectedValues.join(';');
+                            
+                            const updatedForm = {
+                                ...Form,
+                                questions: Form.questions.map((q, qIndex) =>
+                                    qIndex === index ? { ...q, value: newValue } : q
+                                )
+                            };
+                            SetForm(updatedForm);
+                        };
+
+                        return (
+                            <div key={question.id || index} className='flex flex-col w-full max-w-[400px] pl-8'>
+                                <label className="mb-1 text-sm font-medium text-gray-700">{question.title}</label>
+                                <div className="flex flex-col gap-2 mt-2">
+                                    {question.choices.map((choice, choiceIndex) => {
+                                        const isSelected = selectedValues.includes(choice);
+                                        return (
+                                            <label key={choiceIndex} className="flex items-center gap-2 cursor-pointer">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={isSelected}
+                                                    onChange={(e) => handleToggleChange(choice, e.target.checked)}
+                                                    className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                                                />
+                                                <span className="text-sm text-gray-700">{choice}</span>
+                                            </label>
+                                        );
+                                    })}
+                                </div>
+                                {/* Debug info - remove in production */}
+                                <div className="mt-2 text-xs text-gray-500">
+                                    Selected: {question.value || 'none'}
+                                </div>
                             </div>
                         )
                     }
