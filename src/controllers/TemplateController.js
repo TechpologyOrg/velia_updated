@@ -116,7 +116,10 @@ EXAMPLE TEMPLATE WITH VISIBILITY:
 
 // Centralized visibility evaluation functions
 const evaluateVisibilityCondition = (condition, template, vars) => {
-    if (!condition || !template) return false;
+    if (!condition || !template) {
+        console.log('Visibility condition evaluation skipped:', { condition, template: !!template });
+        return false;
+    }
     
     const { path, op, value } = condition;
     
@@ -128,10 +131,24 @@ const evaluateVisibilityCondition = (condition, template, vars) => {
         const [formIndex, questionIndex] = path.split('.').map(Number);
         const question = template[formIndex]?.questions?.[questionIndex];
         targetValue = question?.value;
+        console.log('Cross-form visibility check:', { 
+            path, 
+            formIndex, 
+            questionIndex, 
+            question: question?.title, 
+            targetValue, 
+            expectedValue: value 
+        });
     } else if (path.startsWith('vars.')) {
         // Variable reference: "vars.variableName"
         const varKey = path.replace('vars.', '');
         targetValue = vars?.[varKey];
+        console.log('Variable visibility check:', { 
+            path, 
+            varKey, 
+            targetValue, 
+            expectedValue: value 
+        });
     } else {
         // Direct question reference within current form
         const questionIndex = parseInt(path);
@@ -139,6 +156,13 @@ const evaluateVisibilityCondition = (condition, template, vars) => {
             form.questions?.some(q => q.id === questionIndex)
         )?.questions?.find(q => q.id === questionIndex);
         targetValue = question?.value;
+        console.log('Question ID visibility check:', { 
+            path, 
+            questionIndex, 
+            question: question?.title, 
+            targetValue, 
+            expectedValue: value 
+        });
     }
     
     // Handle different operators
@@ -169,25 +193,38 @@ const evaluateVisibilityCondition = (condition, template, vars) => {
 };
 
 const evaluateVisibilityConditions = (visibleWhen, template, vars) => {
-    if (!visibleWhen) return true;
+    if (!visibleWhen) {
+        console.log('No visibility conditions, showing by default');
+        return true;
+    }
+    
+    console.log('Evaluating visibility conditions:', { visibleWhen, templateLength: template?.length, vars });
     
     // Handle different condition structures
     if (visibleWhen.anyOf) {
         // OR logic - any condition can be true
-        return visibleWhen.anyOf.some(condition => 
+        const result = visibleWhen.anyOf.some(condition => 
             evaluateVisibilityCondition(condition, template, vars)
         );
+        console.log('anyOf visibility result:', result);
+        return result;
     } else if (visibleWhen.allOf) {
         // AND logic - all conditions must be true
-        return visibleWhen.allOf.every(condition => 
+        const result = visibleWhen.allOf.every(condition => 
             evaluateVisibilityCondition(condition, template, vars)
         );
+        console.log('allOf visibility result:', result);
+        return result;
     } else if (visibleWhen.not) {
         // NOT logic - condition must be false
-        return !evaluateVisibilityCondition(visibleWhen.not, template, vars);
+        const result = !evaluateVisibilityCondition(visibleWhen.not, template, vars);
+        console.log('not visibility result:', result);
+        return result;
     } else {
         // Single condition
-        return evaluateVisibilityCondition(visibleWhen, template, vars);
+        const result = evaluateVisibilityCondition(visibleWhen, template, vars);
+        console.log('single condition visibility result:', result);
+        return result;
     }
 };
 
@@ -364,6 +401,15 @@ export function GenerateTemplate({ template, SetTemplate, onFormChange }) {
     useEffect(() => {
         setForceUpdate(prev => prev + 1);
     }, [template]);
+    
+    // Show loading state if template is not properly initialized
+    if (!template || !template.answers || template.answers.length === 0) {
+        return (
+            <div className='flex flex-col w-full items-center justify-center p-8'>
+                <div className='text-gray-500'>Loading form...</div>
+            </div>
+        );
+    }
 
     return (
         <div className='flex flex-col w-full'>
