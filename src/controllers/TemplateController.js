@@ -62,7 +62,8 @@ SUPPORTED OPERATORS:
 
 PATH FORMATS:
 -------------
-- "0.2": Cross-form reference (form 0, question 2)
+- "0.2": Cross-form reference (form 0, question with ID 2)
+- "0.1": Cross-form reference (form 0, question at index 1) - fallback
 - "vars.customer_name": Variable reference
 - "123": Question ID reference (searches all forms)
 
@@ -163,15 +164,26 @@ const evaluateVisibilityCondition = (condition, template, vars) => {
     let targetValue = null;
     
     if (path.includes('.')) {
-        // Cross-form reference: "formIndex.questionIndex"
-        const [formIndex, questionIndex] = path.split('.').map(Number);
-        const question = template[formIndex]?.questions?.[questionIndex];
+        // Cross-form reference: "formIndex.questionId" or "formIndex.questionIndex"
+        const [formIndex, questionRef] = path.split('.');
+        const formIdx = parseInt(formIndex);
+        const questionRefNum = parseInt(questionRef);
+        
+        // Try to find by question ID first, then by index
+        let question = template[formIdx]?.questions?.find(q => q.id === questionRefNum);
+        if (!question) {
+            // Fallback to index-based lookup
+            question = template[formIdx]?.questions?.[questionRefNum];
+        }
+        
         targetValue = question?.value;
         console.log('Cross-form visibility check:', { 
             path, 
-            formIndex, 
-            questionIndex, 
+            formIndex: formIdx, 
+            questionRef, 
             question: question?.title, 
+            questionId: question?.id,
+            questionType: question?.type,
             targetValue, 
             expectedValue: value 
         });
@@ -223,7 +235,15 @@ const evaluateVisibilityCondition = (condition, template, vars) => {
         case 'lessThan':
             return Number(targetValue) < Number(value);
         case 'greaterThanOrEqual':
-            return Number(targetValue) >= Number(value);
+            const gteResult = Number(targetValue) >= Number(value);
+            console.log('GreaterThanOrEqual check:', { 
+                targetValue, 
+                targetValueNumber: Number(targetValue),
+                compareValue: value, 
+                compareValueNumber: Number(value),
+                result: gteResult 
+            });
+            return gteResult;
         case 'lessThanOrEqual':
             return Number(targetValue) <= Number(value);
         case 'isEmpty':
@@ -253,10 +273,15 @@ const evaluateVisibilityConditions = (visibleWhen, template, vars) => {
         return result;
     } else if (visibleWhen.allOf) {
         // AND logic - all conditions must be true
-        const result = visibleWhen.allOf.every(condition => 
+        const results = visibleWhen.allOf.map(condition => 
             evaluateVisibilityCondition(condition, template, vars)
         );
-        console.log('allOf visibility result:', result);
+        const result = results.every(r => r);
+        console.log('allOf visibility result:', { 
+            conditions: visibleWhen.allOf, 
+            results, 
+            finalResult: result 
+        });
         return result;
     } else if (visibleWhen.not) {
         // NOT logic - condition must be false
