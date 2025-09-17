@@ -197,7 +197,8 @@ const evaluateVisibilityCondition = (condition, template, vars) => {
             questionIndex, 
             question: question?.title, 
             targetValue, 
-            expectedValue: value 
+            expectedValue: value,
+            questionType: question?.type
         });
     }
     
@@ -208,7 +209,13 @@ const evaluateVisibilityCondition = (condition, template, vars) => {
         case 'notEquals':
             return String(targetValue) !== String(value);
         case 'contains':
-            return String(targetValue).includes(String(value));
+            const containsResult = String(targetValue).includes(String(value));
+            console.log('Contains check:', { 
+                targetValue: String(targetValue), 
+                searchValue: String(value), 
+                result: containsResult 
+            });
+            return containsResult;
         case 'notContains':
             return !String(targetValue).includes(String(value));
         case 'greaterThan':
