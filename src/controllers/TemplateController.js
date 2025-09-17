@@ -75,6 +75,7 @@ SUPPORTED QUESTION TYPES:
 - date: Date picker
 - display: Read-only display field (uses vars)
 - toggleList: Multiple selection checkboxes (semicolon-separated values)
+- title: Section header/title (styled paragraph)
 
 EXAMPLE TEMPLATE WITH VISIBILITY:
 ---------------------------------
@@ -100,6 +101,12 @@ EXAMPLE TEMPLATE WITH VISIBILITY:
         "type": "toggleList",
         "value": "",
         "choices": ["JavaScript", "Python", "React", "Node.js", "SQL"]
+      },
+      {
+        "id": 8,
+        "title": "Section Header",
+        "type": "title",
+        "value": "Additional Information"
       },
       {
         "id": 4,
@@ -457,6 +464,12 @@ export function GenerateForm({ Form, SetForm, template, vars }) {
                                 <div className="mt-2 text-xs text-gray-500">
                                     Selected: {question.value || 'none'}
                                 </div>
+                            </div>
+                        )
+                    } else if (question.type === 'title') {
+                        return (
+                            <div key={question.id || index} className='flex flex-col w-full pl-8 mt-6 mb-4'>
+                                <p className="text-lg font-semibold text-gray-800">{question.value}</p>
                             </div>
                         )
                     }
