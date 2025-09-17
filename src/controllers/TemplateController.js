@@ -197,6 +197,16 @@ export function GenerateForm({ Form, SetForm, template, vars }) {
         return evaluateVisibilityConditions(Form.visibleWhen, template, vars);
     }, [Form.visibleWhen, template, vars]);
 
+    // Compute visibility for all questions - must be called before any early returns
+    const questionVisibility = useMemo(() => {
+        if (!Form || !Form.questions || !Array.isArray(Form.questions)) {
+            return [];
+        }
+        return Form.questions.map(question => 
+            evaluateVisibilityConditions(question.visibleWhen, template, vars)
+        );
+    }, [Form.questions, template, vars]);
+
     // Add safety check for Form.questions
     if (!Form || !Form.questions || !Array.isArray(Form.questions)) {
         console.error('GenerateForm: Invalid Form or questions data:', Form);
@@ -206,13 +216,6 @@ export function GenerateForm({ Form, SetForm, template, vars }) {
     if (!isFormVisible) {
         return null;
     }
-
-    // Compute visibility for all questions outside the map function
-    const questionVisibility = useMemo(() => {
-        return Form.questions.map(question => 
-            evaluateVisibilityConditions(question.visibleWhen, template, vars)
-        );
-    }, [Form.questions, template, vars]);
 
     return (
         <div className='flex flex-col w-full p-4'>
