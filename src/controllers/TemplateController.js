@@ -68,7 +68,7 @@ PATH FORMATS:
 
 SUPPORTED QUESTION TYPES:
 ------------------------
-- text: Single-line text input
+- text: Single-line text input (supports placeholder)
 - numeric: Number input
 - choice: Single selection dropdown
 - boolean: Checkbox (true/false)
@@ -113,6 +113,7 @@ EXAMPLE TEMPLATE WITH VISIBILITY:
         "title": "Company Name",
         "type": "text",
         "value": "",
+        "placeholder": "Enter your company name",
         "visibleWhen": {
           "path": "2",
           "op": "equals", 
@@ -338,6 +339,7 @@ export function GenerateForm({ Form, SetForm, template, vars }) {
                                 <input
                                     type="text"
                                     value={question.value}
+                                    placeholder={question.placeholder || ''}
                                     onChange={(e) => {
                                         const updatedForm = {
                                             ...Form,
