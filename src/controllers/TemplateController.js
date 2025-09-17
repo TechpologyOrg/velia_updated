@@ -207,6 +207,13 @@ export function GenerateForm({ Form, SetForm, template, vars }) {
         return null;
     }
 
+    // Compute visibility for all questions outside the map function
+    const questionVisibility = useMemo(() => {
+        return Form.questions.map(question => 
+            evaluateVisibilityConditions(question.visibleWhen, template, vars)
+        );
+    }, [Form.questions, template, vars]);
+
     return (
         <div className='flex flex-col w-full p-4'>
             <p className='text-xl font-bold'>{Form.title}</p>
@@ -214,10 +221,8 @@ export function GenerateForm({ Form, SetForm, template, vars }) {
 
             <div className='flex flex-col w-full gap-4'>
                 {Form.questions.map((question, index) => {
-                    // Check question-level visibility
-                    const isQuestionVisible = useMemo(() => {
-                        return evaluateVisibilityConditions(question.visibleWhen, template, vars);
-                    }, [question.visibleWhen, template, vars]);
+                    // Check question-level visibility using pre-computed values
+                    const isQuestionVisible = questionVisibility[index];
 
                     if (!isQuestionVisible) {
                         return null;
