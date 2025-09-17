@@ -1,84 +1,201 @@
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useState, useMemo, useCallback} from 'react'
 import V_Input from '../components/V_Input';
 
 /* 
+VISIBILITY SYSTEM DOCUMENTATION
+================================
+
+The refactored visibility system supports both form-level and question-level visibility conditions.
+It properly handles React re-renders and supports cross-form dependencies.
+
+VISIBILITY CONDITION STRUCTURES:
+--------------------------------
+
+1. Single Condition:
+   {
+     "visibleWhen": {
+       "path": "0.2",           // formIndex.questionIndex or questionId
+       "op": "equals",          // operator
+       "value": "some value"    // comparison value
+     }
+   }
+
+2. OR Logic (anyOf):
+   {
+     "visibleWhen": {
+       "anyOf": [
+         {"path": "0.2", "op": "equals", "value": "option1"},
+         {"path": "0.2", "op": "equals", "value": "option2"}
+       ]
+     }
+   }
+
+3. AND Logic (allOf):
+   {
+     "visibleWhen": {
+       "allOf": [
+         {"path": "0.2", "op": "equals", "value": "employed"},
+         {"path": "0.3", "op": "greaterThan", "value": "18"}
+       ]
+     }
+   }
+
+4. NOT Logic:
+   {
+     "visibleWhen": {
+       "not": {"path": "0.2", "op": "equals", "value": "student"}
+     }
+   }
+
+SUPPORTED OPERATORS:
+-------------------
+- equals: String equality
+- notEquals: String inequality  
+- contains: String contains
+- notContains: String does not contain
+- greaterThan: Numeric greater than
+- lessThan: Numeric less than
+- greaterThanOrEqual: Numeric >=
+- lessThanOrEqual: Numeric <=
+- isEmpty: Value is empty/null/undefined
+- isNotEmpty: Value has content
+
+PATH FORMATS:
+-------------
+- "0.2": Cross-form reference (form 0, question 2)
+- "vars.customer_name": Variable reference
+- "123": Question ID reference (searches all forms)
+
+EXAMPLE TEMPLATE WITH VISIBILITY:
+---------------------------------
 [
-    {
-      "id": 0,
-      "title": "Identitet & kontaktuppgifter",
-      "type": "form",
-      "questions":
-      [
-        {"id": 0,"title": "Namn", "type": "display", "key": "customer_full_name"},
-        {"id": 1,"title": "Personnummer", "type": "display", "key": "customer_personnummer"},
-        {"id": 2,"title": "Address", "type": "text", "value": ""},
-        {"id": 3,"title": "Email", "type": "text", "value": ""},
-        {"id": 4,"title": "Telefon", "type": "text", "value": ""},
-        {"id": 5,"title": "Ägarandel", "type": "numeric", "value": 0}
-      ]
+  {
+    "id": 0,
+    "title": "Personal Information",
+    "type": "form",
+    "visibleWhen": true,  // Always visible
+    "questions": [
+      {"id": 0, "title": "Name", "type": "text", "value": ""},
+      {"id": 1, "title": "Age", "type": "numeric", "value": 0},
+      {
+        "id": 2, 
+        "title": "Employment Status", 
+        "type": "choice", 
+        "value": "",
+        "choices": ["employed", "student", "unemployed"]
+      },
+      {
+        "id": 3,
+        "title": "Company Name",
+        "type": "text",
+        "value": "",
+        "visibleWhen": {
+          "path": "2",
+          "op": "equals", 
+          "value": "employed"
+        }
+      }
+    ]
+  },
+  {
+    "id": 1,
+    "title": "Employment Details",
+    "type": "form",
+    "visibleWhen": {
+      "path": "0.2",
+      "op": "equals",
+      "value": "employed"
     },
-    {
-      "id": 1,
-      "title": "Sysselsättning",
-      "type": "form",
-      "questions":
-      [
-        {"id": 0,"title": "Heltidsanställd", "type": "text", "value": ""},
-        {"id": 1,"title": "Deltidsanställd", "type": "text", "value": ""},
-        {"id": 2,"title": "Egenföretagare", "type": "text", "value": ""},
-        {"id": 3,"title": "Student", "type": "text", "value": ""},
-        {"id": 4,"title": "Pensionär", "type": "text", "value": ""},
-        {"id": 5,"title": "Sjuk-/aktivitetsersättning", "type": "text", "value": ""},
-        {"id": 6,"title": "Arbetssökande", "type": "text", "value": ""},
-        {"id": 7,"title": "Annat", "type": "text", "value": ""}
-      ]
-    } 
-  ]
- */
+    "questions": [
+      {"id": 4, "title": "Job Title", "type": "text", "value": ""},
+      {"id": 5, "title": "Salary", "type": "numeric", "value": 0}
+    ]
+  }
+]
+*/
+
+// Centralized visibility evaluation functions
+const evaluateVisibilityCondition = (condition, template, vars) => {
+    if (!condition || !template) return false;
+    
+    const { path, op, value } = condition;
+    
+    // Handle different path formats
+    let targetValue = null;
+    
+    if (path.includes('.')) {
+        // Cross-form reference: "formIndex.questionIndex"
+        const [formIndex, questionIndex] = path.split('.').map(Number);
+        const question = template[formIndex]?.questions?.[questionIndex];
+        targetValue = question?.value;
+    } else if (path.startsWith('vars.')) {
+        // Variable reference: "vars.variableName"
+        const varKey = path.replace('vars.', '');
+        targetValue = vars?.[varKey];
+    } else {
+        // Direct question reference within current form
+        const questionIndex = parseInt(path);
+        const question = template.find(form => 
+            form.questions?.some(q => q.id === questionIndex)
+        )?.questions?.find(q => q.id === questionIndex);
+        targetValue = question?.value;
+    }
+    
+    // Handle different operators
+    switch (op) {
+        case 'equals':
+            return String(targetValue) === String(value);
+        case 'notEquals':
+            return String(targetValue) !== String(value);
+        case 'contains':
+            return String(targetValue).includes(String(value));
+        case 'notContains':
+            return !String(targetValue).includes(String(value));
+        case 'greaterThan':
+            return Number(targetValue) > Number(value);
+        case 'lessThan':
+            return Number(targetValue) < Number(value);
+        case 'greaterThanOrEqual':
+            return Number(targetValue) >= Number(value);
+        case 'lessThanOrEqual':
+            return Number(targetValue) <= Number(value);
+        case 'isEmpty':
+            return !targetValue || String(targetValue).trim() === '';
+        case 'isNotEmpty':
+            return targetValue && String(targetValue).trim() !== '';
+        default:
+            return false;
+    }
+};
+
+const evaluateVisibilityConditions = (visibleWhen, template, vars) => {
+    if (!visibleWhen) return true;
+    
+    // Handle different condition structures
+    if (visibleWhen.anyOf) {
+        // OR logic - any condition can be true
+        return visibleWhen.anyOf.some(condition => 
+            evaluateVisibilityCondition(condition, template, vars)
+        );
+    } else if (visibleWhen.allOf) {
+        // AND logic - all conditions must be true
+        return visibleWhen.allOf.every(condition => 
+            evaluateVisibilityCondition(condition, template, vars)
+        );
+    } else if (visibleWhen.not) {
+        // NOT logic - condition must be false
+        return !evaluateVisibilityCondition(visibleWhen.not, template, vars);
+    } else {
+        // Single condition
+        return evaluateVisibilityCondition(visibleWhen, template, vars);
+    }
+};
 
 export function GenerateForm({ Form, SetForm, template, vars }) {
-    // Compute visibility without causing re-renders
-    let visible = false;
-
-    if (
-        Form.visibleWhen &&
-        Object.prototype.hasOwnProperty.call(Form.visibleWhen, 'anyOf')
-    ) {
-        for (let i = 0; i < Form.visibleWhen.anyOf.length; i++) {
-            const cond = Form.visibleWhen.anyOf[i];
-            const [formIndex, questionIndex] = cond.path.split('.').map(Number);
-            const question =
-                template &&
-                template[formIndex] &&
-                template[formIndex].questions &&
-                template[formIndex].questions[questionIndex];
-
-            if (!question) continue;
-
-            if (cond.op === 'equals') {
-                if (
-                    (typeof question.value === 'boolean'
-                        ? String(question.value)
-                        : question.value) === cond.value
-                ) {
-                    visible = true;
-                    break;
-                }
-            }
-            if (cond.op === 'notEquals') {
-                if (
-                    (typeof question.value === 'boolean'
-                        ? String(question.value)
-                        : question.value) !== cond.value
-                ) {
-                    visible = true;
-                    break;
-                }
-            }
-        }
-    }else{
-        visible = true;
-    }
+    // Use useMemo to compute visibility and trigger re-renders when dependencies change
+    const isFormVisible = useMemo(() => {
+        return evaluateVisibilityConditions(Form.visibleWhen, template, vars);
+    }, [Form.visibleWhen, template, vars]);
 
     // Add safety check for Form.questions
     if (!Form || !Form.questions || !Array.isArray(Form.questions)) {
@@ -86,7 +203,7 @@ export function GenerateForm({ Form, SetForm, template, vars }) {
         return <div>Error: Invalid form data</div>;
     }
 
-    if (!visible) {
+    if (!isFormVisible) {
         return null;
     }
 
@@ -97,6 +214,14 @@ export function GenerateForm({ Form, SetForm, template, vars }) {
 
             <div className='flex flex-col w-full gap-4'>
                 {Form.questions.map((question, index) => {
+                    // Check question-level visibility
+                    const isQuestionVisible = useMemo(() => {
+                        return evaluateVisibilityConditions(question.visibleWhen, template, vars);
+                    }, [question.visibleWhen, template, vars]);
+
+                    if (!isQuestionVisible) {
+                        return null;
+                    }
                     if (question.type === 'display') {
                         question.value = vars[question.key];
                         return (
@@ -225,6 +350,12 @@ export function GenerateTemplate({ template, SetTemplate, onFormChange }) {
     console.log('Safe template (answers):', safeTemplate);
     
     const [pageIndex, setPageIndex] = useState(0);
+    const [forceUpdate, setForceUpdate] = useState(0);
+    
+    // Force re-render when template changes to update visibility
+    useEffect(() => {
+        setForceUpdate(prev => prev + 1);
+    }, [template]);
 
     return (
         <div className='flex flex-col w-full'>
@@ -244,6 +375,8 @@ export function GenerateTemplate({ template, SetTemplate, onFormChange }) {
                                     )
                                 };
                                 SetTemplate(updatedTemplate);
+                                // Force visibility re-evaluation
+                                setForceUpdate(prev => prev + 1);
                                 // Notify parent component that form has changed
                                 if (onFormChange) {
                                     onFormChange();
