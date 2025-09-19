@@ -77,6 +77,7 @@ SUPPORTED QUESTION TYPES:
 - display: Read-only display field (uses vars)
 - toggleList: Multiple selection checkboxes (semicolon-separated values)
 - title: Section header/title (styled paragraph)
+- paragraph: Display paragraph text (supports line breaks and longer content)
 
 EXAMPLE TEMPLATE WITH VISIBILITY:
 ---------------------------------
@@ -108,6 +109,12 @@ EXAMPLE TEMPLATE WITH VISIBILITY:
         "title": "Section Header",
         "type": "title",
         "value": "Additional Information"
+      },
+      {
+        "id": 9,
+        "title": "Information Text",
+        "type": "paragraph",
+        "value": "This is a paragraph that can contain longer text content. It supports line breaks and is perfect for displaying instructions, descriptions, or any multi-line text content."
       },
       {
         "id": 4,
@@ -504,6 +511,12 @@ export function GenerateForm({ Form, SetForm, template, vars }) {
                         return (
                             <div key={question.id || index} className='flex flex-col w-full pl-8 mt-6 mb-4'>
                                 <p className="text-lg font-semibold text-gray-800">{question.value}</p>
+                            </div>
+                        )
+                    } else if (question.type === 'paragraph') {
+                        return (
+                            <div key={question.id || index} className='flex flex-col w-full pl-8 mt-4 mb-4'>
+                                <p className="text-base text-gray-700 leading-relaxed whitespace-pre-wrap">{question.value}</p>
                             </div>
                         )
                     }
