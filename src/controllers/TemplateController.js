@@ -140,7 +140,7 @@ EXAMPLE TEMPLATE WITH VISIBILITY:
         "id": 5,
         "title": "Senior Developer",
         "type": "boolean",
-        "value": false,
+        "value": "false",
         "visibleWhen": {
           "path": "3",
           "op": "contains",
@@ -431,12 +431,12 @@ export function GenerateForm({ Form, SetForm, template, vars }) {
                                 <label className="mb-1 text-sm font-medium text-gray-700">{question.title}</label>
                                 <input
                                     type="checkbox"
-                                    checked={question.value}
+                                    checked={question.value === "true"}
                                     onChange={(e) => {
                                         const updatedForm = {
                                             ...Form,
                                             questions: Form.questions.map((q, qIndex) =>
-                                                qIndex === index ? { ...q, value: e.target.checked } : q
+                                                qIndex === index ? { ...q, value: e.target.checked ? "true" : "false" } : q
                                             )
                                         };
                                         SetForm(updatedForm);
