@@ -1,4 +1,5 @@
 import React, {useEffect, useState, useMemo, useCallback} from 'react'
+import ReactMarkdown from 'react-markdown'
 import V_Input from '../components/V_Input';
 
 /* 
@@ -78,6 +79,7 @@ SUPPORTED QUESTION TYPES:
 - toggleList: Multiple selection checkboxes (semicolon-separated values)
 - title: Section header/title (styled paragraph)
 - paragraph: Display paragraph text (supports line breaks and longer content)
+- markdown: Display markdown content (supports headers, lists, links, formatting, etc.)
 
 EXAMPLE TEMPLATE WITH VISIBILITY:
 ---------------------------------
@@ -115,6 +117,12 @@ EXAMPLE TEMPLATE WITH VISIBILITY:
         "title": "Information Text",
         "type": "paragraph",
         "value": "This is a paragraph that can contain longer text content. It supports line breaks and is perfect for displaying instructions, descriptions, or any multi-line text content."
+      },
+      {
+        "id": 10,
+        "title": "Markdown Content",
+        "type": "markdown",
+        "value": "## Instructions\n\nPlease complete the following steps:\n\n1. **Fill in your personal information**\n2. *Verify your contact details*\n3. Submit the form\n\n> **Note**: All fields marked with * are required.\n\nFor more information, visit [our website](https://example.com)."
       },
       {
         "id": 4,
@@ -517,6 +525,14 @@ export function GenerateForm({ Form, SetForm, template, vars }) {
                         return (
                             <div key={question.id || index} className='flex flex-col w-full pl-8 mt-4 mb-4'>
                                 <p className="text-base text-gray-700 leading-relaxed whitespace-pre-wrap">{question.value}</p>
+                            </div>
+                        )
+                    } else if (question.type === 'markdown') {
+                        return (
+                            <div key={question.id || index} className='flex flex-col w-full pl-8 mt-4 mb-4'>
+                                <div className="prose prose-sm max-w-none">
+                                    <ReactMarkdown>{question.value || ''}</ReactMarkdown>
+                                </div>
                             </div>
                         )
                     }
