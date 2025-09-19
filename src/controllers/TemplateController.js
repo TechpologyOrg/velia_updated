@@ -312,6 +312,8 @@ const evaluateVisibilityConditions = (visibleWhen, template, vars) => {
 };
 
 export function GenerateForm({ Form, SetForm, template, vars }) {
+    console.log('GenerateForm called with:', { Form, templateLength: template?.length, vars });
+    
     // Use useMemo to compute visibility and trigger re-renders when dependencies change
     const isFormVisible = useMemo(() => {
         return evaluateVisibilityConditions(Form.visibleWhen, template, vars);
@@ -346,8 +348,17 @@ export function GenerateForm({ Form, SetForm, template, vars }) {
                 {Form.questions.map((question, index) => {
                     // Check question-level visibility using pre-computed values
                     const isQuestionVisible = questionVisibility[index];
+                    
+                    console.log('Processing question:', { 
+                        id: question.id, 
+                        title: question.title, 
+                        type: question.type, 
+                        index, 
+                        isVisible: isQuestionVisible 
+                    });
 
                     if (!isQuestionVisible) {
+                        console.log('Question not visible, skipping:', question.title);
                         return null;
                     }
                     if (question.type === 'display') {
@@ -528,11 +539,33 @@ export function GenerateForm({ Form, SetForm, template, vars }) {
                             </div>
                         )
                     } else if (question.type === 'markdown') {
+                        console.log('Rendering markdown type:', { question, index });
+                        try {
+                            return (
+                                <div key={question.id || index} className='flex flex-col w-full pl-8 mt-4 mb-4'>
+                                    <div className="bg-yellow-100 p-2 mb-2 text-xs">
+                                        DEBUG: Markdown type detected - ID: {question.id}, Title: {question.title}
+                                    </div>
+                                    <div className="prose prose-sm max-w-none">
+                                        <ReactMarkdown>{question.value || ''}</ReactMarkdown>
+                                    </div>
+                                </div>
+                            )
+                        } catch (error) {
+                            console.error('Error rendering markdown:', error);
+                            return (
+                                <div key={question.id || index} className='flex flex-col w-full pl-8 mt-4 mb-4'>
+                                    <div className="text-red-500">Error rendering markdown content</div>
+                                    <div className="text-gray-700 whitespace-pre-wrap">{question.value || ''}</div>
+                                </div>
+                            )
+                        }
+                    } else {
+                        console.warn('Unknown question type:', question.type, 'for question:', question.title);
                         return (
                             <div key={question.id || index} className='flex flex-col w-full pl-8 mt-4 mb-4'>
-                                <div className="prose prose-sm max-w-none">
-                                    <ReactMarkdown>{question.value || ''}</ReactMarkdown>
-                                </div>
+                                <p className="text-red-500">Unknown question type: {question.type}</p>
+                                <p className="text-gray-700">{question.value}</p>
                             </div>
                         )
                     }
@@ -569,7 +602,9 @@ export function GenerateTemplate({ template, SetTemplate, onFormChange }) {
     return (
         <div className='flex flex-col w-full'>
             {safeTemplate.map((form, index) => {
+                console.log('Checking form:', { formId: form.id, formTitle: form.title, index, pageIndex, isActive: index === pageIndex });
                 if(index === pageIndex){
+                    console.log('Rendering active form:', form);
                     return (
                         <GenerateForm
                             key={form.id || index}
