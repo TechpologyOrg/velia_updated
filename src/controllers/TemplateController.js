@@ -50,14 +50,26 @@ VISIBILITY CONDITION STRUCTURES:
 
 SUPPORTED OPERATORS:
 -------------------
-- equals: String equality
-- notEquals: String inequality  
+- equals: String equality (also works for dates)
+- notEquals: String inequality (also works for dates)
 - contains: String contains
 - notContains: String does not contain
-- greaterThan: Numeric greater than
-- lessThan: Numeric less than
-- greaterThanOrEqual: Numeric >=
-- lessThanOrEqual: Numeric <=
+- greaterThan: Numeric greater than (also works for dates)
+- lessThan: Numeric less than (also works for dates)
+- greaterThanOrEqual: Numeric >= (also works for dates)
+- lessThanOrEqual: Numeric <= (also works for dates)
+- before: Date-specific operator - target date is before compare date
+- after: Date-specific operator - target date is after compare date
+- on: Date-specific operator - target date is on the same day as compare date
+- daysAgo: Dynamic operator - target date is N days before current date (value = number of days)
+- daysFromNow: Dynamic operator - target date is N days after current date (value = number of days)
+- monthsAgo: Dynamic operator - target date is N months before current date (value = number of months)
+- monthsFromNow: Dynamic operator - target date is N months after current date (value = number of months)
+- yearsAgo: Dynamic operator - target date is N years before current date (value = number of years)
+- yearsFromNow: Dynamic operator - target date is N years after current date (value = number of years)
+- isPast: Dynamic operator - target date is in the past (no value needed)
+- isFuture: Dynamic operator - target date is in the future (no value needed)
+- isToday: Dynamic operator - target date is today (no value needed)
 - isEmpty: Value is empty/null/undefined
 - isNotEmpty: Value has content
 
@@ -70,7 +82,7 @@ PATH FORMATS:
 
 SUPPORTED QUESTION TYPES:
 ------------------------
-- text: Single-line text input (supports placeholder)
+- text: Single-line text input (supports placeholder, regex validation)
 - numeric: Number input
 - choice: Single selection dropdown
 - boolean: Checkbox (true/false)
@@ -81,6 +93,29 @@ SUPPORTED QUESTION TYPES:
 - paragraph: Display paragraph text (supports line breaks and longer content)
 - markdown: Display markdown content (supports headers, lists, links, formatting, etc.)
 
+TEXT INPUT REGEX VALIDATION:
+----------------------------
+Text inputs support real-time regex validation using the 'regex' property:
+
+{
+  "id": 1,
+  "title": "Email Address",
+  "type": "text",
+  "value": "",
+  "placeholder": "Enter your email",
+  "regex": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
+}
+
+Common regex patterns:
+- Email: "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
+- Phone (US): "^\\\\([0-9]{3}\\\\) [0-9]{3}-[0-9]{4}$"
+- Postal Code (US): "^[0-9]{5}(-[0-9]{4})?$"
+- SSN: "^[0-9]{3}-[0-9]{2}-[0-9]{4}$"
+- Credit Card: "^[0-9]{4} [0-9]{4} [0-9]{4} [0-9]{4}$"
+- Alphanumeric only: "^[a-zA-Z0-9]+$"
+- Letters only: "^[a-zA-Z]+$"
+- Numbers only: "^[0-9]+$"
+
 EXAMPLE TEMPLATE WITH VISIBILITY:
 ---------------------------------
 [
@@ -90,7 +125,29 @@ EXAMPLE TEMPLATE WITH VISIBILITY:
     "type": "form",
     "visibleWhen": true,  // Always visible
     "questions": [
-      {"id": 0, "title": "Name", "type": "text", "value": ""},
+      {
+        "id": 0,
+        "title": "Name",
+        "type": "text",
+        "value": "",
+        "regex": "^[a-zA-Z\\s]+$"
+      },
+      {
+        "id": 0.1,
+        "title": "Email Address",
+        "type": "text",
+        "value": "",
+        "placeholder": "Enter your email",
+        "regex": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
+      },
+      {
+        "id": 0.2,
+        "title": "Phone Number",
+        "type": "text",
+        "value": "",
+        "placeholder": "(555) 123-4567",
+        "regex": "^\\\\([0-9]{3}\\\\) [0-9]{3}-[0-9]{4}$"
+      },
       {"id": 1, "title": "Age", "type": "numeric", "value": 0},
       {
         "id": 2, 
@@ -145,6 +202,61 @@ EXAMPLE TEMPLATE WITH VISIBILITY:
           "path": "3",
           "op": "contains",
           "value": "JavaScript"
+        }
+      },
+      {
+        "id": 11,
+        "title": "Birth Date",
+        "type": "date",
+        "value": ""
+      },
+      {
+        "id": 12,
+        "title": "Age Verification",
+        "type": "boolean",
+        "value": "false",
+        "visibleWhen": {
+          "path": "11",
+          "op": "before",
+          "value": "2005-01-01"
+        }
+      },
+      {
+        "id": 13,
+        "title": "Last Login Date",
+        "type": "date",
+        "value": "2024-01-01"
+      },
+      {
+        "id": 14,
+        "title": "Account Inactive Warning",
+        "type": "boolean",
+        "value": "false",
+        "visibleWhen": {
+          "path": "13",
+          "op": "monthsAgo",
+          "value": "6"
+        }
+      },
+      {
+        "id": 15,
+        "title": "Upcoming Event",
+        "type": "boolean",
+        "value": "false",
+        "visibleWhen": {
+          "path": "13",
+          "op": "daysFromNow",
+          "value": "30"
+        }
+      },
+      {
+        "id": 16,
+        "title": "Past Event Notice",
+        "type": "boolean",
+        "value": "false",
+        "visibleWhen": {
+          "path": "13",
+          "op": "isPast"
         }
       }
     ]
@@ -229,11 +341,63 @@ const evaluateVisibilityCondition = (condition, template, vars) => {
         });
     }
     
+    // Helper function to check if a value looks like a date
+    const isDateValue = (val) => {
+        if (!val) return false;
+        const str = String(val);
+        // Check for common date formats: YYYY-MM-DD, MM/DD/YYYY, DD/MM/YYYY, etc.
+        return /^\d{4}-\d{2}-\d{2}$/.test(str) || // YYYY-MM-DD
+               /^\d{1,2}\/\d{1,2}\/\d{4}$/.test(str) || // MM/DD/YYYY or DD/MM/YYYY
+               /^\d{1,2}-\d{1,2}-\d{4}$/.test(str); // MM-DD-YYYY or DD-MM-YYYY
+    };
+
+    // Helper function to convert date string to Date object
+    const parseDate = (dateStr) => {
+        if (!dateStr) return null;
+        const str = String(dateStr);
+        
+        // Handle YYYY-MM-DD format (ISO date)
+        if (/^\d{4}-\d{2}-\d{2}$/.test(str)) {
+            return new Date(str);
+        }
+        
+        // Handle MM/DD/YYYY or DD/MM/YYYY format
+        if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(str)) {
+            const parts = str.split('/');
+            // Assume MM/DD/YYYY format (US format)
+            return new Date(parts[2], parts[0] - 1, parts[1]);
+        }
+        
+        // Handle MM-DD-YYYY or DD-MM-YYYY format
+        if (/^\d{1,2}-\d{1,2}-\d{4}$/.test(str)) {
+            const parts = str.split('-');
+            // Assume MM-DD-YYYY format (US format)
+            return new Date(parts[2], parts[0] - 1, parts[1]);
+        }
+        
+        // Try parsing as-is
+        const parsed = new Date(str);
+        return isNaN(parsed.getTime()) ? null : parsed;
+    };
+
+    // Check if both values are dates for date-specific comparisons
+    const isDateComparison = isDateValue(targetValue) && isDateValue(value);
+    
     // Handle different operators
     switch (op) {
         case 'equals':
+            if (isDateComparison) {
+                const targetDate = parseDate(targetValue);
+                const compareDate = parseDate(value);
+                return targetDate && compareDate && targetDate.getTime() === compareDate.getTime();
+            }
             return String(targetValue) === String(value);
         case 'notEquals':
+            if (isDateComparison) {
+                const targetDate = parseDate(targetValue);
+                const compareDate = parseDate(value);
+                return !targetDate || !compareDate || targetDate.getTime() !== compareDate.getTime();
+            }
             return String(targetValue) !== String(value);
         case 'contains':
             const containsResult = String(targetValue).includes(String(value));
@@ -246,10 +410,25 @@ const evaluateVisibilityCondition = (condition, template, vars) => {
         case 'notContains':
             return !String(targetValue).includes(String(value));
         case 'greaterThan':
+            if (isDateComparison) {
+                const targetDate = parseDate(targetValue);
+                const compareDate = parseDate(value);
+                return targetDate && compareDate && targetDate.getTime() > compareDate.getTime();
+            }
             return Number(targetValue) > Number(value);
         case 'lessThan':
+            if (isDateComparison) {
+                const targetDate = parseDate(targetValue);
+                const compareDate = parseDate(value);
+                return targetDate && compareDate && targetDate.getTime() < compareDate.getTime();
+            }
             return Number(targetValue) < Number(value);
         case 'greaterThanOrEqual':
+            if (isDateComparison) {
+                const targetDate = parseDate(targetValue);
+                const compareDate = parseDate(value);
+                return targetDate && compareDate && targetDate.getTime() >= compareDate.getTime();
+            }
             const gteResult = Number(targetValue) >= Number(value);
             console.log('GreaterThanOrEqual check:', { 
                 targetValue, 
@@ -260,7 +439,120 @@ const evaluateVisibilityCondition = (condition, template, vars) => {
             });
             return gteResult;
         case 'lessThanOrEqual':
+            if (isDateComparison) {
+                const targetDate = parseDate(targetValue);
+                const compareDate = parseDate(value);
+                return targetDate && compareDate && targetDate.getTime() <= compareDate.getTime();
+            }
             return Number(targetValue) <= Number(value);
+        case 'before':
+            // Date-specific operator: target date is before compare date
+            if (isDateComparison) {
+                const targetDate = parseDate(targetValue);
+                const compareDate = parseDate(value);
+                return targetDate && compareDate && targetDate.getTime() < compareDate.getTime();
+            }
+            return false;
+        case 'after':
+            // Date-specific operator: target date is after compare date
+            if (isDateComparison) {
+                const targetDate = parseDate(targetValue);
+                const compareDate = parseDate(value);
+                return targetDate && compareDate && targetDate.getTime() > compareDate.getTime();
+            }
+            return false;
+        case 'on':
+            // Date-specific operator: target date is on the same day as compare date
+            if (isDateComparison) {
+                const targetDate = parseDate(targetValue);
+                const compareDate = parseDate(value);
+                return targetDate && compareDate && 
+                       targetDate.getFullYear() === compareDate.getFullYear() &&
+                       targetDate.getMonth() === compareDate.getMonth() &&
+                       targetDate.getDate() === compareDate.getDate();
+            }
+            return false;
+        case 'daysAgo':
+            // Dynamic operator: target date is N days before current date
+            if (isDateValue(targetValue)) {
+                const targetDate = parseDate(targetValue);
+                const now = new Date();
+                const daysDiff = Math.floor((now.getTime() - targetDate.getTime()) / (1000 * 60 * 60 * 24));
+                return targetDate && daysDiff >= Number(value);
+            }
+            return false;
+        case 'daysFromNow':
+            // Dynamic operator: target date is N days after current date
+            if (isDateValue(targetValue)) {
+                const targetDate = parseDate(targetValue);
+                const now = new Date();
+                const daysDiff = Math.floor((targetDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+                return targetDate && daysDiff >= Number(value);
+            }
+            return false;
+        case 'monthsAgo':
+            // Dynamic operator: target date is N months before current date
+            if (isDateValue(targetValue)) {
+                const targetDate = parseDate(targetValue);
+                const now = new Date();
+                const monthsDiff = (now.getFullYear() - targetDate.getFullYear()) * 12 + (now.getMonth() - targetDate.getMonth());
+                return targetDate && monthsDiff >= Number(value);
+            }
+            return false;
+        case 'monthsFromNow':
+            // Dynamic operator: target date is N months after current date
+            if (isDateValue(targetValue)) {
+                const targetDate = parseDate(targetValue);
+                const now = new Date();
+                const monthsDiff = (targetDate.getFullYear() - now.getFullYear()) * 12 + (targetDate.getMonth() - now.getMonth());
+                return targetDate && monthsDiff >= Number(value);
+            }
+            return false;
+        case 'yearsAgo':
+            // Dynamic operator: target date is N years before current date
+            if (isDateValue(targetValue)) {
+                const targetDate = parseDate(targetValue);
+                const now = new Date();
+                const yearsDiff = now.getFullYear() - targetDate.getFullYear();
+                return targetDate && yearsDiff >= Number(value);
+            }
+            return false;
+        case 'yearsFromNow':
+            // Dynamic operator: target date is N years after current date
+            if (isDateValue(targetValue)) {
+                const targetDate = parseDate(targetValue);
+                const now = new Date();
+                const yearsDiff = targetDate.getFullYear() - now.getFullYear();
+                return targetDate && yearsDiff >= Number(value);
+            }
+            return false;
+        case 'isPast':
+            // Dynamic operator: target date is in the past
+            if (isDateValue(targetValue)) {
+                const targetDate = parseDate(targetValue);
+                const now = new Date();
+                return targetDate && targetDate.getTime() < now.getTime();
+            }
+            return false;
+        case 'isFuture':
+            // Dynamic operator: target date is in the future
+            if (isDateValue(targetValue)) {
+                const targetDate = parseDate(targetValue);
+                const now = new Date();
+                return targetDate && targetDate.getTime() > now.getTime();
+            }
+            return false;
+        case 'isToday':
+            // Dynamic operator: target date is today
+            if (isDateValue(targetValue)) {
+                const targetDate = parseDate(targetValue);
+                const now = new Date();
+                return targetDate && 
+                       targetDate.getFullYear() === now.getFullYear() &&
+                       targetDate.getMonth() === now.getMonth() &&
+                       targetDate.getDate() === now.getDate();
+            }
+            return false;
         case 'isEmpty':
             return !targetValue || String(targetValue).trim() === '';
         case 'isNotEmpty':
@@ -312,6 +604,9 @@ const evaluateVisibilityConditions = (visibleWhen, template, vars) => {
 };
 
 export function GenerateForm({ Form, SetForm, template, vars }) {
+    // State to track validation errors for each question
+    const [validationErrors, setValidationErrors] = useState({});
+
     // Use useMemo to compute visibility and trigger re-renders when dependencies change
     const isFormVisible = useMemo(() => {
         return evaluateVisibilityConditions(Form.visibleWhen, template, vars);
@@ -326,6 +621,30 @@ export function GenerateForm({ Form, SetForm, template, vars }) {
             evaluateVisibilityConditions(question.visibleWhen, template, vars)
         );
     }, [Form.questions, template, vars]);
+
+    // Helper function to validate regex patterns
+    const validateRegex = (value, regexPattern) => {
+        if (!regexPattern || !value) return true; // No regex or empty value is valid
+        try {
+            const regex = new RegExp(regexPattern);
+            return regex.test(value);
+        } catch (error) {
+            console.warn('Invalid regex pattern:', regexPattern, error);
+            return true; // If regex is invalid, don't block the user
+        }
+    };
+
+    // Helper function to update validation errors
+    const updateValidationError = (questionId, isValid) => {
+        setValidationErrors(prev => {
+            if (isValid) {
+                const { [questionId]: removed, ...rest } = prev;
+                return rest;
+            } else {
+                return { ...prev, [questionId]: true };
+            }
+        });
+    };
 
     // Add safety check for Form.questions
     if (!Form || !Form.questions || !Array.isArray(Form.questions)) {
@@ -380,6 +699,9 @@ export function GenerateForm({ Form, SetForm, template, vars }) {
                             </div>
                         )
                     }else if (question.type === 'text') {
+                        const hasError = validationErrors[question.id];
+                        const isValid = !question.regex || validateRegex(question.value, question.regex);
+                        
                         return (
                             <div key={question.id || index} className='flex flex-col w-full max-w-[400px] pl-8'>
                                 <label className="mb-1 text-sm font-medium text-gray-700">{question.title}</label>
@@ -388,17 +710,33 @@ export function GenerateForm({ Form, SetForm, template, vars }) {
                                     value={question.value}
                                     placeholder={question.placeholder || ''}
                                     onChange={(e) => {
+                                        const newValue = e.target.value;
                                         const updatedForm = {
                                             ...Form,
                                             questions: Form.questions.map((q, qIndex) =>
-                                                qIndex === index ? { ...q, value: e.target.value } : q
+                                                qIndex === index ? { ...q, value: newValue } : q
                                             )
                                         };
                                         SetForm(updatedForm);
+                                        
+                                        // Validate regex in real-time
+                                        if (question.regex) {
+                                            const isValid = validateRegex(newValue, question.regex);
+                                            updateValidationError(question.id, isValid);
+                                        }
                                     }}
-                                    className="bg-transparent border-0 border-b-2 border-gray-300 focus:border-blue-500 outline-none px-0 py-1 text-base"
+                                    className={`bg-transparent border-0 border-b-2 outline-none px-0 py-1 text-base ${
+                                        hasError 
+                                            ? 'border-red-500 focus:border-red-600' 
+                                            : 'border-gray-300 focus:border-blue-500'
+                                    }`}
                                     style={{ borderRadius: 0 }}
                                 />
+                                {hasError && question.regex && (
+                                    <p className="mt-1 text-xs text-red-600">
+                                        Invalid format. Please check your input.
+                                    </p>
+                                )}
                             </div>
                         )
                     } else if (question.type === 'choice') {
