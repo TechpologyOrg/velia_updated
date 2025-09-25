@@ -295,7 +295,9 @@ export default function DashboardGroupView() {
 
                 // KYC
                 var pep_status = "No Screening Results";
-                if(task.customer?.verified) {
+                console.log("task.customer?.verified:", task.customer?.verified);
+                console.log("task.customer?:", task.customer);
+                if(task.customer?.verified == true) {
                     pep_status = "<p className='bg-green-500 text-white px-2 py-1 rounded-md'>Verifierad</p>";
                 } else {
                     pep_status = "<p className='bg-red-500 text-white px-2 py-1 rounded-md'>Ej verifierad</p>";
