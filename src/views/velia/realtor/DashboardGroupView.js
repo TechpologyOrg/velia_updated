@@ -364,7 +364,7 @@ export default function DashboardGroupView() {
                             ]
                         },
                         { "tag": "p", "type": "display", "value": "Screening" },
-                        { "tag": "p", "type": "display", "var": "ScreeningResults", "value": "" }
+                        { "tag": "p", "type": "display", "var": "pep_status", "value": "" }
                     ]
                 }
             ]

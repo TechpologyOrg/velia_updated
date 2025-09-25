@@ -231,10 +231,20 @@ export function CardTemplateRenderer({ jsonTemplate, globalVars, onChange, onSav
 
         // Standard HTML tags
         const Tag = tag || 'div';
+        
+        // Check if value contains HTML tags and should be rendered as HTML
+        const isHtmlContent = value && typeof value === 'string' && /<[^>]*>/g.test(value);
+        
         return (
             <Tag key={path.join('-')} className={className || ''}>
                 {title && <div className="mb-1 text-sm font-medium text-gray-700">{title}</div>}
-                {value && value}
+                {value && (
+                    isHtmlContent ? (
+                        <span dangerouslySetInnerHTML={{ __html: value }} />
+                    ) : (
+                        value
+                    )
+                )}
                 {children && renderNode(children, [...path, 'children'])}
             </Tag>
         );
