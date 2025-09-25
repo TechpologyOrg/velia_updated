@@ -902,6 +902,28 @@ export function GenerateTemplate({ template, SetTemplate, onFormChange }) {
     useEffect(() => {
         setForceUpdate(prev => prev + 1);
     }, [template]);
+
+    // Create a mapping of visible forms and their original indices
+    const visibleForms = useMemo(() => {
+        return safeTemplate.map((form, originalIndex) => ({
+            form,
+            originalIndex,
+            isVisible: evaluateVisibilityConditions(form.visibleWhen, safeTemplate, template.vars)
+        })).filter(item => item.isVisible);
+    }, [safeTemplate, template.vars, forceUpdate]);
+
+    // Reset pageIndex if it's out of bounds for visible forms
+    useEffect(() => {
+        if (pageIndex >= visibleForms.length && visibleForms.length > 0) {
+            setPageIndex(visibleForms.length - 1);
+        } else if (pageIndex < 0 && visibleForms.length > 0) {
+            setPageIndex(0);
+        }
+    }, [visibleForms.length, pageIndex]);
+
+    // Get the current visible form
+    const currentVisibleForm = visibleForms[pageIndex];
+    const currentFormIndex = currentVisibleForm ? currentVisibleForm.originalIndex : -1;
     
     // Show loading state if template is not properly initialized
     if (!template || !template.answers || template.answers.length === 0) {
@@ -912,40 +934,44 @@ export function GenerateTemplate({ template, SetTemplate, onFormChange }) {
         );
     }
 
+    // Show message if no forms are visible
+    if (visibleForms.length === 0) {
+        return (
+            <div className='flex flex-col w-full items-center justify-center p-8'>
+                <div className='text-gray-500'>No forms are currently visible based on the conditions.</div>
+            </div>
+        );
+    }
+
     return (
         <div className='flex flex-col w-full'>
-            {safeTemplate.map((form, index) => {
-                if(index === pageIndex){
-                    return (
-                        <GenerateForm
-                            key={form.id || index}
-                            Form={form}
-                            vars={template.vars}
-                            SetForm={(updatedForm) => {
-                                // Always create a new array and new form object to ensure React state updates
-                                const updatedTemplate = {
-                                    ...template,
-                                    answers: safeTemplate.map((f, i) =>
-                                        i === index ? { ...updatedForm } : f
-                                    )
-                                };
-                                SetTemplate(updatedTemplate);
-                                // Force visibility re-evaluation
-                                setForceUpdate(prev => prev + 1);
-                                // Notify parent component that form has changed
-                                if (onFormChange) {
-                                    onFormChange();
-                                }
-                            }}
-                            template={safeTemplate}
-                        />
-                    )
-                }
-                return null; // Explicitly return null for non-active indices
-            })}
+            {currentVisibleForm && (
+                <GenerateForm
+                    key={currentVisibleForm.form.id || currentFormIndex}
+                    Form={currentVisibleForm.form}
+                    vars={template.vars}
+                    SetForm={(updatedForm) => {
+                        // Always create a new array and new form object to ensure React state updates
+                        const updatedTemplate = {
+                            ...template,
+                            answers: safeTemplate.map((f, i) =>
+                                i === currentFormIndex ? { ...updatedForm } : f
+                            )
+                        };
+                        SetTemplate(updatedTemplate);
+                        // Force visibility re-evaluation
+                        setForceUpdate(prev => prev + 1);
+                        // Notify parent component that form has changed
+                        if (onFormChange) {
+                            onFormChange();
+                        }
+                    }}
+                    template={safeTemplate}
+                />
+            )}
             <div className='flex flex-col w-full items-center justify-center mt-6'>
                 <div className='w-full h-2 bg-gray-200 rounded-full mb-4'>
-                    <div className='h-full bg-black rounded-full' style={{width: `${(pageIndex / safeTemplate.length) * 100}%`}}></div>
+                    <div className='h-full bg-black rounded-full' style={{width: `${(pageIndex / visibleForms.length) * 100}%`}}></div>
                 </div>
                 <div className='w-full flex flex-row items-center justify-between'>
                     <button 
@@ -958,7 +984,7 @@ export function GenerateTemplate({ template, SetTemplate, onFormChange }) {
                     <button 
                         className='bg-black text-white px-4 py-2 rounded-md' 
                         onClick={() => {setPageIndex(pageIndex + 1)}}
-                        disabled={pageIndex === safeTemplate.length - 1}
+                        disabled={pageIndex === visibleForms.length - 1}
                     >
                         Next
                     </button>
