@@ -87,7 +87,7 @@ SUPPORTED QUESTION TYPES:
 - choice: Single selection dropdown
 - boolean: Checkbox (true/false)
 - date: Date picker
-- display: Read-only display field (uses vars)
+- display: Read-only display field (uses vars via 'key' property or static 'value')
 - toggleList: Multiple selection checkboxes (semicolon-separated values)
 - title: Section header/title (styled paragraph)
 - paragraph: Display paragraph text (supports line breaks and longer content)
@@ -115,6 +115,26 @@ Common regex patterns:
 - Alphanumeric only: "^[a-zA-Z0-9]+$"
 - Letters only: "^[a-zA-Z]+$"
 - Numbers only: "^[0-9]+$"
+
+DISPLAY TYPE USAGE:
+-------------------
+Display fields can show global variables using the 'key' property:
+
+{
+  "id": 13,
+  "title": "Customer Name",
+  "type": "display",
+  "key": "customer_name"
+}
+
+This will display the value of vars.customer_name. If no 'key' is provided, it uses the 'value' property:
+
+{
+  "id": 14,
+  "title": "Static Text",
+  "type": "display",
+  "value": "This is static text"
+}
 
 EXAMPLE TEMPLATE WITH VISIBILITY:
 ---------------------------------
@@ -670,11 +690,11 @@ export function GenerateForm({ Form, SetForm, template, vars }) {
                         return null;
                     }
                     if (question.type === 'display') {
-                        question.value = vars[question.key];
+                        const displayValue = question.key ? vars[question.key] : question.value;
                         return (
                             <div key={question.id || index} className='flex flex-col w-full max-w-[400px] pl-8'>
                                 <label className="mb-1 text-sm font-medium text-gray-700">{question.title}</label>
-                                <p className="text-sm text-gray-500">{question.value}</p>
+                                <p className="text-sm text-gray-500">{displayValue || ''}</p>
                             </div>
                         );
                     } else if (question.type === 'numeric') {
