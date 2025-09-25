@@ -294,18 +294,18 @@ export default function DashboardGroupView() {
                 console.log("KYC task detected:", task.title);
 
                 // KYC
-                var pep_status = "No Screening Results";
+                var id_kontroll_status = "No Screening Results";
                 console.log("task.customer?.verified:", task.customer?.verified);
                 console.log("task.customer?:", task.customer);
                 if(task.customer?.verified == true) {
-                    pep_status = "<p className='bg-green-500 text-white px-2 py-1 rounded-md'>Verifierad</p>";
+                    id_kontroll_status = "<p className='bg-green-500 text-white px-2 py-1 rounded-md'>Verifierad</p>";
                 } else {
-                    pep_status = "<p className='bg-red-500 text-white px-2 py-1 rounded-md'>Ej verifierad</p>";
+                    id_kontroll_status = "<p className='bg-red-500 text-white px-2 py-1 rounded-md'>Ej verifierad</p>";
                 }
 
                 const kycVars = {
                     "adress": task.customer_response?.answers[0]?.questions[2]?.value,
-                    "pep_status": pep_status,
+                    "id_kontroll_status": id_kontroll_status,
                     "id_kontroll": (task.customer.verified) ? "Ja" : "Nej",
                 };
                 console.log("Adding KYC vars:", kycVars);
