@@ -286,14 +286,24 @@ export default function DashboardGroupView() {
                 "email": task.customer?.email,
                 "ägarandel": task.customer?.ägarandel,
                 "formURL": `https://www.velia.se/${task.customer?.organisation?.name}/customer/dashboard/task/${task.customer_response?.id}`,
+                "verified": task.customer?.verified,
             };
             
             // If the task has a property "extraVars", spread its keys into globalVars
             if (task.title.includes("KYC")) {
                 console.log("KYC task detected:", task.title);
+
+                // KYC
+                var pep_status = "No Screening Results";
+                if(task.customer?.verified) {
+                    pep_status = "<p className='bg-green-500 text-white px-2 py-1 rounded-md'>Verifierad</p>";
+                } else {
+                    pep_status = "<p className='bg-red-500 text-white px-2 py-1 rounded-md'>Ej verifierad</p>";
+                }
+
                 const kycVars = {
                     "adress": task.customer_response?.answers[0]?.questions[2]?.value,
-                    "screening_results": "No Screening Results",
+                    "pep_status": task.customer?.verified ? task.customer?.verified : "No Screening Results",
                     "id_kontroll": (task.customer.verified) ? "Ja" : "Nej",
                 };
                 console.log("Adding KYC vars:", kycVars);
