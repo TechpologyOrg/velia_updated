@@ -389,7 +389,7 @@ export default function DashboardGroupView() {
                     <p className='text-sm text-neutral-500 mb-8'>{group.realtor.first_name} {group.realtor.last_name}</p>
 
                     <p className='text-sm text-neutral-500 font-semibold'>Koordinator</p>
-                    <p className='text-sm text-neutral-500'>{group.coordinator.first_name} {group.coordinator.last_name}</p>
+                    <p className='text-sm text-neutral-500'>{group.coordinator ? `${group.coordinator.first_name} ${group.coordinator.last_name}` : 'Ingen koordinator'}</p>
                 </div>
 
                 <div className='flex flex-row flex-1 h-full gap-4 p-4 overflow-x-scroll bg-neutral-100 rounded-md'>

@@ -69,7 +69,7 @@ export default function DashboardGroups() {
         >
           <td>{group.realtor.first_name} {group.realtor.last_name}</td>
           <td>{group.customers.length}</td>
-          <td>{group.coordinator.first_name} {group.coordinator.last_name}</td>
+          <td>{group.coordinator ? `${group.coordinator.first_name} ${group.coordinator.last_name}` : 'Ingen koordinator'}</td>
           <td>{group.address}</td>
           <td>{group.postnummer}</td>
           <td>{group.ort}</td>
