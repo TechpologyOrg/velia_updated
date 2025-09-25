@@ -197,11 +197,12 @@ export default function DashboardGroupsCreate() {
             return;
         }
 
-        if (!selectedCoordinator) {
-            console.error("No coordinator selected");
-            alert("Please select a coordinator");
-            return;
-        }
+        // Coordinator selection is now optional
+        // if (!selectedCoordinator) {
+        //     console.error("No coordinator selected");
+        //     alert("Please select a coordinator");
+        //     return;
+        // }
 
         // Debug: Check if customers are being received from AddCustomerWindow
         console.log("Customers received in createGroup:", customers);
@@ -213,7 +214,7 @@ export default function DashboardGroupsCreate() {
                 address: address,
                 postnummer: postnummer,
                 ort: ort,
-                coordinator: selectedCoordinator.id,
+                coordinator: selectedCoordinator?.id || null,
                 realtor: JSON.parse(sessionStorage.getItem("user")).user?.id || JSON.parse(sessionStorage.getItem("user")).id,
                 customers: []
             }).then(resp => {
@@ -257,7 +258,7 @@ export default function DashboardGroupsCreate() {
                 address: address,
                 postnummer: postnummer,
                 ort: ort,
-                coordinator: selectedCoordinator.id,
+                coordinator: selectedCoordinator?.id || null,
                 realtor: JSON.parse(sessionStorage.getItem("user")).user?.id || JSON.parse(sessionStorage.getItem("user")).id,
                 customers: customerIds
             });
@@ -285,7 +286,7 @@ export default function DashboardGroupsCreate() {
 
                 {/* Add realtor and coordinator */}
                 <V_SelectObject 
-                    cardTitle='Välj koordinator' 
+                    cardTitle='Välj koordinator (valfritt)' 
                     items={coordinators} 
                     displayKey='first_name' 
                     displayKey2='last_name' 
