@@ -297,7 +297,9 @@ export default function DashboardGroupView() {
 
                 const kycVars = {
                     "adress": task.customer_response?.answers[0]?.questions[2]?.value,
-                    "id_kontroll_status": task.customer.verified ? "Slutförd" : "Ej Slutförd",
+                    "id_kontroll_status": task.customer.verified
+                        ? '<p class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">Slutförd</p>'
+                        : '<p class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-800">Ej Slutförd</p>',
                     "id_kontroll": (task.customer.verified) ? "Ja" : "Nej",
                 };
                 console.log("Adding KYC vars:", kycVars);
