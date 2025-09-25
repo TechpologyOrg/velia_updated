@@ -305,7 +305,7 @@ export default function DashboardGroupView() {
 
                 const kycVars = {
                     "adress": task.customer_response?.answers[0]?.questions[2]?.value,
-                    "pep_status": task.customer?.verified ? task.customer?.verified : "No Screening Results",
+                    "pep_status": pep_status,
                     "id_kontroll": (task.customer.verified) ? "Ja" : "Nej",
                 };
                 console.log("Adding KYC vars:", kycVars);
