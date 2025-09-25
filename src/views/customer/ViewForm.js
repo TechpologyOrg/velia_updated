@@ -23,9 +23,12 @@ export default function ViewForm() {
                     setTemplate({
                         answers: answers,
                         vars: {
-                            "customer_full_name": JSON.parse(sessionStorage.getItem('user')).user.first_name + " " + JSON.parse(sessionStorage.getItem('user')).user.last_name,
-                            "customer_personnummer": JSON.parse(sessionStorage.getItem('user')).user.personnummer,
-                            "customer_email": JSON.parse(sessionStorage.getItem('user')).user.email
+                            // "customer_full_name": JSON.parse(sessionStorage.getItem('user')).user.first_name + " " + JSON.parse(sessionStorage.getItem('user')).user.last_name,
+                            // "customer_personnummer": JSON.parse(sessionStorage.getItem('user')).user.personnummer,
+                            // "customer_email": JSON.parse(sessionStorage.getItem('user')).user.email,
+                            "customer_full_name": res.data.task.customer.first_name + " " + res.data.task.customer.last_name,
+                            "customer_personnummer": res.data.task.customer.personnummer,
+                            "customer_email": res.data.task.customer.email
                         },
                         title: res.data.task.title,
                         description: res.data.task.description
