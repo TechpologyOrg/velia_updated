@@ -1,6 +1,6 @@
 import React from "react";
 import { useState, useEffect } from "react";
-import { Button } from "./ui/button";
+import { Button } from "./ui/button.tsx";
 import { Menu, X } from "lucide-react";
 
 export const Navbar = () => {

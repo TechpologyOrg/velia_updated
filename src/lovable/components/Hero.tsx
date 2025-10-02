@@ -1,4 +1,4 @@
-import { Button } from "./ui/button";
+import { Button } from "./ui/button.tsx";
 import { ChevronDown } from "lucide-react";
 import { useState, useEffect } from "react";
 
