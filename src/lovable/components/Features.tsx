@@ -1,5 +1,5 @@
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "./ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Shield, Search, FileText, Brain, AlertTriangle, MessageCircle, Zap } from "lucide-react";
 
 export const Features = () => {
