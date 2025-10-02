@@ -1,9 +1,9 @@
 import React from 'react';
-import { Hero } from "../lovable/components/Hero";
-import { Features } from "../lovable/components/Features";
-import { Development } from "../lovable/components/Development";
-import { Footer } from "../lovable/components/Footer";
-import { Navbar } from "../lovable/components/Navbar";
+import { Hero } from "../lovable/components/Hero.tsx";
+import { Features } from "../lovable/components/Features.tsx";
+import { Development } from "../lovable/components/Development.tsx";
+import { Footer } from "../lovable/components/Footer.tsx";
+import { Navbar } from "../lovable/components/Navbar.tsx";
 
 export default function Dashboard() {
   return (
