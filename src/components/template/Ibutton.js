@@ -9,7 +9,7 @@ import React from 'react';
  * @param {string} props.className - CSS class name
  * @param {string} props.var - Variable name for dynamic value resolution
  */
-export function Ibutton({ title, type, value, className = '', var: varName }) {
+export function Ibutton({ title, type, value, className = '', var: varName, onClick }) {
     console.log('Rendering Ibutton with:', { title, value, var: varName });
     
     if (type && type.toLowerCase() === 'display') {
@@ -33,7 +33,11 @@ export function Ibutton({ title, type, value, className = '', var: varName }) {
                     className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors"
                     onClick={() => {
                         console.log('Ibutton clicked, value:', value, 'var:', varName);
-                        window.open(value || '#', '_blank');
+                        if (onClick) {
+                            onClick();
+                        } else {
+                            window.open(value || '#', '_blank');
+                        }
                     }}
                 >
                     {title || 'Button'}

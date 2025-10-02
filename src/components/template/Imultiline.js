@@ -1,4 +1,5 @@
 import React from 'react';
+import V_Tooltip from '../V_Tooltip';
 
 /**
  * Imultiline Component - Renders a multiline text input (textarea)
@@ -7,13 +8,19 @@ import React from 'react';
  * @param {string} props.type - "editable" or "display" mode
  * @param {string} props.value - Current text value
  * @param {string} props.className - CSS class name
+ * @param {string} props.hint - Optional tooltip text for help
  * @param {Function} props.onChange - Callback when text changes
  */
-export function Imultiline({ title, type, value, className = '', onChange }) {
+export function Imultiline({ title, type, value, className = '', onChange, hint }) {
     if (type && type.toLowerCase() === 'display') {
         return (
             <div className={className || ''}>
-                {title && <label className="mb-1 text-sm font-medium text-gray-700">{title}</label>}
+                {title && (
+                    <label className="mb-1 text-sm font-medium text-gray-700 flex items-center">
+                        {title}
+                        {hint && <V_Tooltip hint={hint} position="top" />}
+                    </label>
+                )}
                 <textarea
                     value={value || ''}
                     readOnly
@@ -27,7 +34,12 @@ export function Imultiline({ title, type, value, className = '', onChange }) {
         // Editable or standard
         return (
             <div className={className || ''}>
-                {title && <label className="mb-1 text-sm font-medium text-gray-700">{title}</label>}
+                {title && (
+                    <label className="mb-1 text-sm font-medium text-gray-700 flex items-center">
+                        {title}
+                        {hint && <V_Tooltip hint={hint} position="top" />}
+                    </label>
+                )}
                 <textarea
                     value={value || ''}
                     onChange={e => {

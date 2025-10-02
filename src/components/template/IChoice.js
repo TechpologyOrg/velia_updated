@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import V_Tooltip from '../V_Tooltip';
 
 /**
  * IChoice Component - Renders a custom dropdown with selectable options
@@ -8,15 +9,21 @@ import React, { useState } from 'react';
  * @param {string} props.value - Currently selected value
  * @param {Array} props.choices - Array of available choices
  * @param {string} props.className - CSS class name
+ * @param {string} props.hint - Optional tooltip text for help
  * @param {Function} props.onChange - Callback when selection changes
  */
-export function IChoice({ title, type, value, choices = [], className = '', onChange }) {
+export function IChoice({ title, type, value, choices = [], className = '', onChange, hint }) {
     const [isOpen, setIsOpen] = useState(false);
     
     if (type && type.toLowerCase() === 'display') {
         return (
             <div className={className || ''}>
-                {title && <label className="mb-1 text-sm font-medium text-gray-700">{title}</label>}
+                {title && (
+                    <label className="mb-1 text-sm font-medium text-gray-700 flex items-center">
+                        {title}
+                        {hint && <V_Tooltip hint={hint} position="top" />}
+                    </label>
+                )}
                 <div className="w-full bg-gray-100 border border-gray-300 rounded px-2 py-1 text-gray-500">
                     {value || (title ? `Select ${title.toLowerCase()}` : 'Select an option')}
                 </div>
@@ -26,7 +33,12 @@ export function IChoice({ title, type, value, choices = [], className = '', onCh
         // Editable or standard - Custom dropdown
         return (
             <div className={className || ''} style={{ position: 'relative' }}>
-                {title && <label className="mb-1 text-sm font-medium text-gray-700">{title}</label>}
+                {title && (
+                    <label className="mb-1 text-sm font-medium text-gray-700 flex items-center">
+                        {title}
+                        {hint && <V_Tooltip hint={hint} position="top" />}
+                    </label>
+                )}
                 <div className="relative">
                     <button
                         type="button"

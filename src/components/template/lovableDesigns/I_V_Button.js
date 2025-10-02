@@ -21,7 +21,8 @@ export function I_V_Button({
     variant = 'default', 
     size = 'default',
     var: varName,
-    onChange 
+    onChange,
+    onClick
 }) {
     // Button variant styles
     const getVariantStyles = (variant) => {
@@ -79,7 +80,9 @@ export function I_V_Button({
                     className={buttonClasses}
                     onClick={() => {
                         console.log('I_V_Button clicked, value:', value, 'var:', varName);
-                        if (onChange) {
+                        if (onClick) {
+                            onClick();
+                        } else if (onChange) {
                             onChange(value || '#');
                         }
                         // Open URL in new tab if value is a URL

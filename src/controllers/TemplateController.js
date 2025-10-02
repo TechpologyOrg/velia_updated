@@ -1,6 +1,7 @@
 import React, {useEffect, useState, useMemo, useCallback} from 'react'
 import ReactMarkdown from 'react-markdown'
 import V_Input from '../components/V_Input';
+import V_Tooltip from '../components/V_Tooltip';
 
 /* 
 VISIBILITY SYSTEM DOCUMENTATION
@@ -82,16 +83,29 @@ PATH FORMATS:
 
 SUPPORTED QUESTION TYPES:
 ------------------------
-- text: Single-line text input (supports placeholder, regex validation)
-- numeric: Number input
-- choice: Single selection dropdown
-- boolean: Checkbox (true/false)
-- date: Date picker
-- display: Read-only display field (uses vars via 'key' property or static 'value')
-- toggleList: Multiple selection checkboxes (semicolon-separated values)
+- text: Single-line text input (supports placeholder, regex validation, hint tooltip)
+- numeric: Number input (supports hint tooltip)
+- choice: Single selection dropdown (supports hint tooltip)
+- boolean: Checkbox (true/false) (supports hint tooltip)
+- date: Date picker (supports hint tooltip)
+- display: Read-only display field (uses vars via 'key' property or static 'value', supports hint tooltip)
+- toggleList: Multiple selection checkboxes (semicolon-separated values, supports hint tooltip)
 - title: Section header/title (styled paragraph)
 - paragraph: Display paragraph text (supports line breaks and longer content)
 - markdown: Display markdown content (supports headers, lists, links, formatting, etc.)
+
+HINT TOOLTIP SUPPORT:
+--------------------
+All interactive question types support an optional 'hint' property that displays a help tooltip:
+{
+  "id": 1,
+  "title": "Email Address",
+  "type": "text",
+  "value": "",
+  "hint": "Enter your email address for account verification and notifications"
+}
+
+The tooltip appears when hovering over or focusing the question mark icon next to the field title.
 
 TEXT INPUT REGEX VALIDATION:
 ----------------------------
@@ -158,7 +172,8 @@ EXAMPLE TEMPLATE WITH VISIBILITY:
         "type": "text",
         "value": "",
         "placeholder": "Enter your email",
-        "regex": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
+        "regex": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
+        "hint": "Enter your email address for account verification and notifications"
       },
       {
         "id": 0.2,
@@ -174,14 +189,16 @@ EXAMPLE TEMPLATE WITH VISIBILITY:
         "title": "Employment Status", 
         "type": "choice", 
         "value": "",
-        "choices": ["employed", "student", "unemployed"]
+        "choices": ["employed", "student", "unemployed"],
+        "hint": "Select your current employment status to show relevant follow-up questions"
       },
       {
         "id": 3,
         "title": "Skills",
         "type": "toggleList",
         "value": "",
-        "choices": ["JavaScript", "Python", "React", "Node.js", "SQL"]
+        "choices": ["JavaScript", "Python", "React", "Node.js", "SQL"],
+        "hint": "Select all programming languages and technologies you have experience with"
       },
       {
         "id": 8,
@@ -666,6 +683,18 @@ export function GenerateForm({ Form, SetForm, template, vars }) {
         });
     };
 
+    // Helper function to render label with optional tooltip
+    const renderLabel = (question) => {
+        return (
+            <label className="mb-1 text-sm font-medium text-gray-700 flex items-center">
+                {question.title}
+                {question.hint && (
+                    <V_Tooltip hint={question.hint} position="top" />
+                )}
+            </label>
+        );
+    };
+
     // Add safety check for Form.questions
     if (!Form || !Form.questions || !Array.isArray(Form.questions)) {
         console.error('GenerateForm: Invalid Form or questions data:', Form);
@@ -693,14 +722,14 @@ export function GenerateForm({ Form, SetForm, template, vars }) {
                         const displayValue = question.key ? vars[question.key] : question.value;
                         return (
                             <div key={question.id || index} className='flex flex-col w-full max-w-[400px] pl-8'>
-                                <label className="mb-1 text-sm font-medium text-gray-700">{question.title}</label>
+                                {renderLabel(question)}
                                 <p className="text-sm text-gray-500">{displayValue || ''}</p>
                             </div>
                         );
                     } else if (question.type === 'numeric') {
                         return (
                             <div key={question.id || index} className='flex flex-col w-full max-w-[400px] pl-8'>
-                                <label className="mb-1 text-sm font-medium text-gray-700">{question.title}</label>
+                                {renderLabel(question)}
                                 <input
                                     type="number"
                                     value={question.value}
@@ -724,7 +753,7 @@ export function GenerateForm({ Form, SetForm, template, vars }) {
                         
                         return (
                             <div key={question.id || index} className='flex flex-col w-full max-w-[400px] pl-8'>
-                                <label className="mb-1 text-sm font-medium text-gray-700">{question.title}</label>
+                                {renderLabel(question)}
                                 <input
                                     type="text"
                                     value={question.value}
@@ -762,7 +791,7 @@ export function GenerateForm({ Form, SetForm, template, vars }) {
                     } else if (question.type === 'choice') {
                         return (
                             <div key={question.id || index} className='flex flex-col w-full max-w-[400px] pl-8'>
-                                <label className="mb-1 text-sm font-medium text-gray-700">{question.title}</label>
+                                {renderLabel(question)}
                                 <select
                                     value={question.value}
                                     onChange={(e) => {
@@ -786,7 +815,12 @@ export function GenerateForm({ Form, SetForm, template, vars }) {
                     }else if (question.type === 'boolean') {
                         return (
                             <div key={question.id || index} className='flex flex-row items-center gap-2 w-full max-w-[400px] pl-8'>
-                                <label className="mb-1 text-sm font-medium text-gray-700">{question.title}</label>
+                                <div className="flex items-center">
+                                    <label className="mb-1 text-sm font-medium text-gray-700">{question.title}</label>
+                                    {question.hint && (
+                                        <V_Tooltip hint={question.hint} position="top" />
+                                    )}
+                                </div>
                                 <input
                                     type="checkbox"
                                     checked={question.value === "true"}
@@ -806,7 +840,7 @@ export function GenerateForm({ Form, SetForm, template, vars }) {
                     else if(question.type === 'date') {
                         return (
                             <div key={question.id || index} className='flex flex-col w-full max-w-[400px] pl-8'>
-                                <label className="mb-1 text-sm font-medium text-gray-700">{question.title}</label>
+                                {renderLabel(question)}
                                 <input
                                     type="date"
                                     value={question.value}
@@ -850,7 +884,7 @@ export function GenerateForm({ Form, SetForm, template, vars }) {
 
                         return (
                             <div key={question.id || index} className='flex flex-col w-full max-w-[400px] pl-8'>
-                                <label className="mb-1 text-sm font-medium text-gray-700">{question.title}</label>
+                                {renderLabel(question)}
                                 <div className="flex flex-col gap-2 mt-2">
                                     {question.choices.map((choice, choiceIndex) => {
                                         const isSelected = selectedValues.includes(choice);
