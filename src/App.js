@@ -1,12 +1,12 @@
 import React, { useEffect } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom';
 
-import Home from './views/Home';
+import Dashboard from './views/Dashboard';
 import Login from './views/Login';
 
 import Callback from './views/criipto/Callback';
 
-import Dashboard from './views/velia/Dashboard';
+import VeliaDashboard from './views/velia/Dashboard';
 import AuthenticationController from './controllers/AuthenticationController';
 import { useAuth } from './context/AuthContext';
 import { bindAuthHelpers } from './lib/axiosClient';
@@ -33,14 +33,14 @@ export default function App() {
 
   return (
     <Routes>
-      <Route path='/' element={<Home />} />
+      <Route path='/' element={<Dashboard />} />
       <Route path='/Login' element={<Login />} />
 
       <Route path='/criipto/callback' element={<Callback />} />
       <Route path='/controllers/authenticate' element={<AuthenticationController />} />
       <Route path='/controllers/customer/authenticate' element={<CustomerAuthenticationController />} />
 
-      <Route path='/dashboard' element={<Dashboard />} >
+      <Route path='/dashboard' element={<VeliaDashboard />} >
         <Route path='groups' element={<DashboardGroups />} />
         <Route path='groups/:id' element={<DashboardGroupView />} />
         <Route path='groups/create' element={<DashboardGroupsCreate />} />
