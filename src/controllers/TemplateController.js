@@ -532,7 +532,16 @@ const evaluateVisibilityCondition = (condition, template, vars) => {
             if (isDateValue(targetValue)) {
                 const targetDate = parseDate(targetValue);
                 const now = new Date();
-                const monthsDiff = (now.getFullYear() - targetDate.getFullYear()) * 12 + (now.getMonth() - targetDate.getMonth());
+                
+                // Calculate months difference more accurately
+                let monthsDiff = (now.getFullYear() - targetDate.getFullYear()) * 12 + (now.getMonth() - targetDate.getMonth());
+                
+                // If the day of the target date is greater than the day of the current date,
+                // we need to subtract 1 month to get a more accurate count
+                if (now.getDate() < targetDate.getDate()) {
+                    monthsDiff -= 1;
+                }
+                
                 return targetDate && monthsDiff >= Number(value);
             }
             return false;
@@ -541,7 +550,16 @@ const evaluateVisibilityCondition = (condition, template, vars) => {
             if (isDateValue(targetValue)) {
                 const targetDate = parseDate(targetValue);
                 const now = new Date();
-                const monthsDiff = (targetDate.getFullYear() - now.getFullYear()) * 12 + (targetDate.getMonth() - now.getMonth());
+                
+                // Calculate months difference more accurately
+                let monthsDiff = (targetDate.getFullYear() - now.getFullYear()) * 12 + (targetDate.getMonth() - now.getMonth());
+                
+                // If the day of the target date is less than the day of the current date,
+                // we need to subtract 1 month to get a more accurate count
+                if (targetDate.getDate() < now.getDate()) {
+                    monthsDiff -= 1;
+                }
+                
                 return targetDate && monthsDiff >= Number(value);
             }
             return false;
@@ -550,7 +568,17 @@ const evaluateVisibilityCondition = (condition, template, vars) => {
             if (isDateValue(targetValue)) {
                 const targetDate = parseDate(targetValue);
                 const now = new Date();
-                const yearsDiff = now.getFullYear() - targetDate.getFullYear();
+                
+                // Calculate years difference more accurately
+                let yearsDiff = now.getFullYear() - targetDate.getFullYear();
+                
+                // If the target date hasn't reached the same month/day as current date,
+                // we need to subtract 1 year to get a more accurate count
+                if (now.getMonth() < targetDate.getMonth() || 
+                    (now.getMonth() === targetDate.getMonth() && now.getDate() < targetDate.getDate())) {
+                    yearsDiff -= 1;
+                }
+                
                 return targetDate && yearsDiff >= Number(value);
             }
             return false;
@@ -559,7 +587,17 @@ const evaluateVisibilityCondition = (condition, template, vars) => {
             if (isDateValue(targetValue)) {
                 const targetDate = parseDate(targetValue);
                 const now = new Date();
-                const yearsDiff = targetDate.getFullYear() - now.getFullYear();
+                
+                // Calculate years difference more accurately
+                let yearsDiff = targetDate.getFullYear() - now.getFullYear();
+                
+                // If the target date hasn't reached the same month/day as current date,
+                // we need to subtract 1 year to get a more accurate count
+                if (targetDate.getMonth() < now.getMonth() || 
+                    (targetDate.getMonth() === now.getMonth() && targetDate.getDate() < now.getDate())) {
+                    yearsDiff -= 1;
+                }
+                
                 return targetDate && yearsDiff >= Number(value);
             }
             return false;
@@ -942,7 +980,7 @@ export function GenerateForm({ Form, SetForm, template, vars }) {
     )
 }
 
-export function GenerateTemplate({ template, SetTemplate, onFormChange }) {
+export function GenerateTemplate({ template, SetTemplate, onFormChange, onSave, onNavigateToDashboard }) {
     console.log('GenerateTemplate received template:', template);
     
     // Defensive copy to avoid mutating the original template
@@ -951,6 +989,8 @@ export function GenerateTemplate({ template, SetTemplate, onFormChange }) {
     
     const [pageIndex, setPageIndex] = useState(0);
     const [forceUpdate, setForceUpdate] = useState(0);
+    const [isCompleted, setIsCompleted] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
     
     // Force re-render when template changes to update visibility
     useEffect(() => {
@@ -997,6 +1037,51 @@ export function GenerateTemplate({ template, SetTemplate, onFormChange }) {
         );
     }
 
+    // Show completion screen
+    if (isCompleted) {
+        return (
+            <div className='flex flex-col w-full items-center justify-center p-8'>
+                <div className='flex flex-col items-center max-w-md text-center'>
+                    {/* Checkmark icon */}
+                    <div className='w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-6'>
+                        <svg className='w-8 h-8 text-green-600' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                            <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M5 13l4 4L19 7' />
+                        </svg>
+                    </div>
+                    
+                    {/* Completion message */}
+                    <h2 className='text-2xl font-bold text-gray-800 mb-2'>Completed!</h2>
+                    <p className='text-gray-600 mb-8'>
+                        Thank you for completing the form. Your responses have been saved successfully.
+                    </p>
+                    
+                    {/* Navigation buttons */}
+                    <div className='flex flex-row gap-4 w-full max-w-sm'>
+                        <button 
+                            className='flex-1 bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300 transition-colors'
+                            onClick={() => {
+                                setIsCompleted(false);
+                                setPageIndex(visibleForms.length - 1);
+                            }}
+                        >
+                            Back to Edit
+                        </button>
+                        <button 
+                            className='flex-1 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors'
+                            onClick={() => {
+                                if (onNavigateToDashboard) {
+                                    onNavigateToDashboard();
+                                }
+                            }}
+                        >
+                            Go to Dashboard
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className='flex flex-col w-full'>
             {currentVisibleForm && (
@@ -1025,7 +1110,7 @@ export function GenerateTemplate({ template, SetTemplate, onFormChange }) {
             )}
             <div className='flex flex-col w-full items-center justify-center mt-6'>
                 <div className='w-full h-2 bg-gray-200 rounded-full mb-4'>
-                    <div className='h-full bg-black rounded-full' style={{width: `${(pageIndex / visibleForms.length) * 100}%`}}></div>
+                    <div className='h-full bg-black rounded-full' style={{width: `${((pageIndex + 1) / visibleForms.length) * 100}%`}}></div>
                 </div>
                 <div className='w-full flex flex-row items-center justify-between'>
                     <button 
@@ -1036,11 +1121,30 @@ export function GenerateTemplate({ template, SetTemplate, onFormChange }) {
                         Back
                     </button>
                     <button 
-                        className='bg-black text-white px-4 py-2 rounded-md' 
-                        onClick={() => {setPageIndex(pageIndex + 1)}}
-                        disabled={pageIndex === visibleForms.length - 1}
+                        className='bg-black text-white px-4 py-2 rounded-md disabled:opacity-50 disabled:cursor-not-allowed' 
+                        onClick={async () => {
+                            if (pageIndex === visibleForms.length - 1) {
+                                // Last form - save and show completion
+                                setIsSaving(true);
+                                try {
+                                    if (onSave) {
+                                        await onSave(template);
+                                    }
+                                    setIsCompleted(true);
+                                } catch (error) {
+                                    console.error('Error saving form:', error);
+                                    // You might want to show an error message here
+                                } finally {
+                                    setIsSaving(false);
+                                }
+                            } else {
+                                // Not last form - go to next
+                                setPageIndex(pageIndex + 1);
+                            }
+                        }}
+                        disabled={isSaving}
                     >
-                        Next
+                        {isSaving ? 'Saving...' : (pageIndex === visibleForms.length - 1 ? 'Complete' : 'Next')}
                     </button>
                 </div>
             </div>

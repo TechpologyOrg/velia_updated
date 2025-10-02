@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { GenerateTemplate } from '../../controllers/TemplateController';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import api from '../../lib/axiosClient';
 
 export default function ViewForm() {
     const { id } = useParams();
+    const navigate = useNavigate();
 
     const [template, setTemplate] = useState([]);
     const [status, setStatus] = useState("pending");
@@ -77,6 +78,31 @@ export default function ViewForm() {
         setSaveStatus("unsaved");
     };
 
+    const handleSave = async (templateData) => {
+        try {
+            setSaveStatus("saving");
+            setStatus("Completed"); // Mark as completed when saving from completion screen
+            await api.put(`/task-responses/${id}/`, {
+                answers: templateData.answers,
+                status: "Completed"
+            });
+            setSaveStatus("saved");
+            setHasUnsavedChanges(false);
+            console.log('Form completed and saved successfully');
+        } catch (error) {
+            console.error("Failed to save completed form:", error);
+            setSaveStatus("unsaved");
+            throw error; // Re-throw so the completion screen can handle it
+        }
+    };
+
+    const handleNavigateToDashboard = () => {
+        // Get organization name from URL path
+        const pathParts = window.location.pathname.split('/');
+        const organizationName = pathParts[1]; // First part after the leading slash
+        navigate(`/${organizationName}/customer/dashboard/home`);
+    };
+
     const getSaveStatusColor = () => {
         switch (saveStatus) {
             case "saved":
@@ -139,6 +165,8 @@ export default function ViewForm() {
                                 setTemplate(newTemplate);
                             }}
                             onFormChange={handleFormChange}
+                            onSave={handleSave}
+                            onNavigateToDashboard={handleNavigateToDashboard}
                         />
                     </div>
                 </div>
